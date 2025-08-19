@@ -6,6 +6,26 @@
 // 👇 ADD NEW VERSIONS AT THE TOP OF THIS ARRAY! 👇
 const versionHistory = [
   {
+    version: '1.0.1',
+    date: '2025-08-18',
+    notes: 'Minor updates and bug fixes',
+    features: [
+      'Improved desktop styles for better readability',
+      'Cleaned up CSS for consistency',
+      'Simplified wording for submit buttons',
+      'Fixed service worker 404 error on results page'
+    ]
+  },
+  {
+    version: '1.0.0-beta',
+    date: '2025-08-18',
+    notes: 'Beta release with initial features',
+    features: [
+      'Initial beta release with core functionality',
+      'Basic PWA support with service worker'
+    ]
+  },
+  {
     version: '1.0.0',
     date: '2025-08-18',
     notes: 'Initial release with full functionality',
