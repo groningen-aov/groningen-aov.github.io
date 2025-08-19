@@ -40,7 +40,7 @@ The Groningen GAM model is based on comprehensive analysis of **75,142 cardiac-h
 ##  Quick Start
 
 ### Live Application
-Access the calculator directly at: **[groningen-aov-zscore.app](https://parameterz.github.io/groningen-aov-zscore/)**
+Access the calculator directly at: **[groningen-aov.github.io](https://groningen-aov.github.io/)**
 
 ### Installation as PWA
 1. Visit the application URL on your mobile device
