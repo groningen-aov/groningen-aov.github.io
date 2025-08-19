@@ -48,7 +48,7 @@ Access the calculator directly at: **[groningen-aov.github.io](https://groningen
 3. Follow browser-specific installation instructions
 4. Access the app from your home screen
 
-## 💻 Development
+## Development
 
 ### Prerequisites
 - Node.js 16.0.0 or higher
@@ -90,7 +90,7 @@ npm run build
 # Files will be generated in /dist directory
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 groningen-aov-zscore/
@@ -175,14 +175,14 @@ npx http-server dist
 python -m http.server 8000 -d dist
 ```
 
-## 📊 Performance
+## Performance
 
 - **Load Time**: <2 seconds on 3G networks
 - **Bundle Size**: <1MB total download
 - **Calculation Speed**: <100ms response time
 - **Offline**: Full functionality without network after initial load
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Process
 1. **Fork** the repository
@@ -204,13 +204,13 @@ python -m http.server 8000 -d dist
 - PWA functionality must work offline
 - Accessibility standards must be maintained
 
-## 📋 Clinical Disclaimer
+## Clinical Disclaimer
 
 **⚠️ For clinical decision support only. Always verify results with institutional protocols and consider individual patient factors when making clinical decisions.**
 
 This tool is designed to assist healthcare providers but should not replace clinical judgment or institutional guidelines. The calculations are based on population statistics and may not account for individual anatomical variations or specific clinical conditions.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
@@ -230,7 +230,7 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 ```
 
-## 📚 References
+## References
 
 ### Model Development
 The Groningen GAM model is based on comprehensive analysis of cardiac-healthy organ donor records. The original research provides the statistical foundation for this clinical tool.
@@ -238,14 +238,14 @@ The Groningen GAM model is based on comprehensive analysis of cardiac-healthy or
 ### External Validation
 Model validation was performed using the Lopez dataset (3,566 individuals under 18 years) available via the [Pediatric Heart Network](https://www.pediatricheartnetwork.org/echo-z-scores/).
 
-## 🔗 Links
+## Links
 
-- **Live Application**: [groningen-aov-zscore.app](https://groningen-aov.github.io/)
+- **Live Application**: [ggroningen-aov.github.io](https://groningen-aov.github.io/)
 - **Documentation**: [Project Docs](docs/)
 - **Issues**: [GitHub Issues](https://github.com/groningen-aov/groningen-aov.github.io/issues)
 - **Roadmap**: [Development Roadmap](docs/roadmap.md)
 
-## 📞 Support
+## Support
 
 For technical issues, feature requests, or clinical questions:
 - **GitHub Issues**: [Report technical problems](https://github.com/groningen-aov/groningen-aov.github.io/issues)

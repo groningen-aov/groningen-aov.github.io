@@ -58,7 +58,7 @@
       "name": "Quick Calculate",
       "short_name": "Calculate",
       "description": "Start a new AOV calculation",
-      "url": "/groningen-aov-zscore/#calculate",
+      "url": "/",
       "icons": [
         {
           "src": "icons/icon-192.png",
