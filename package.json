@@ -1,6 +1,6 @@
 {
   "name": "groningen-aov-zscore",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Progressive Web App for calculating aortic annulus diameter z-scores using the Groningen GAM model",
   "scripts": {
     "start": "npx http-server . -p 3000 -c-1",

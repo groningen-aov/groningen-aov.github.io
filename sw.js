@@ -1,5 +1,5 @@
-const CACHE_NAME = "groningen-aov-v1.0.1"; // ← Update version!
-const DATA_CACHE_NAME = "groningen-aov-data-v1.0.1";
+const CACHE_NAME = "groningen-aov-v1.0.2"; // ← Update version!
+const DATA_CACHE_NAME = "groningen-aov-data-v1.0.2";
 
 // Files to cache for offline functionality - Production file structure
 const FILES_TO_CACHE = [

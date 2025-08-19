@@ -6,6 +6,15 @@
 // 👇 ADD NEW VERSIONS AT THE TOP OF THIS ARRAY! 👇
 const versionHistory = [
   {
+    version: '1.0.2',
+    date: '2025-08-18',
+    notes: 'Updated icons/manifest/sw',
+    features: [
+      'Updated service worker to v1.0.2',
+      'cleaned up icons list in manifest.json',
+    ]
+  },
+  {
     version: '1.0.1',
     date: '2025-08-18',
     notes: 'Minor updates and bug fixes',
