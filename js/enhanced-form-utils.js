@@ -296,6 +296,5 @@ document.addEventListener('DOMContentLoaded', () => {
       window.formController.populateFromURL();
     }
     
-    console.log('Universal form controller initialized');
   }, 50);
 });
