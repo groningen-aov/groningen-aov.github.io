@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Z-Score Results - Groningen AOV Calculator</title>
+    <meta
+      name="description"
+      content="Aortic Valve diameter Z-score calculation results using the Groningen GAM model"
+    />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2060df" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AOV Z-Score Results" />
+
+    <!-- Preload critical resources -->
+    <link
+      rel="preload"
+      href="../data/groningen_aad_lookup.json"
+      as="fetch"
+      crossorigin
+    />
+
+    <!-- Pico.css Blue Theme -->
+    <link rel="stylesheet" href="../style/pico.blue.min.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../style/style.css" />
+
+    <link rel="manifest" href="../manifest.json" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="container-fluid">
+      <ul>
+        <li><a href="/" class="secondary">Home</a></li>
+        <li><a href="/about/" class="secondary">About</a></li>
+        <li><a href="/test/" class="secondary">Test</a></li>
+        <li>
+          <div class="status">
+            <span class="status-indicator" style="color: var(--pico-primary);">●</span>
+            <span>Ready</span>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main container using Pico.css container -->
+    <main class="container">
+      <!-- Header -->
+      <header class="calculator-header">
+        <hgroup>
+          <h1>Z-Score Results</h1>
+          <p>Aortic annulus diameter analysis using the Groningen GAM model</p>
+        </hgroup>
+      </header>
+
+      <!-- Results Section - Now at the top! -->
+      <section class="results" id="resultsSection">
+        <article>
+          <!-- Loading state -->
+          <div id="loadingState" style="text-align: center; padding: 2rem;">
+            <div style="margin-bottom: 1rem;">Loading calculation model...</div>
+            <progress></progress>
+          </div>
+
+          <!-- Results Grid -->
+          <div class="result-grid" id="resultGrid" style="display: none;">
+            <!-- Z-Score Result - Clean outline style -->
+            <div class="result-card z-score-card">
+              <strong>Z-Score</strong>
+              <div class="result-value" id="zScoreValue" style="font-size: 2.2rem; font-weight: 700; color: var(--pico-primary);">--</div>
+            </div>
+
+            <!-- Expected AAD -->
+            <div class="result-card">
+              <strong>Expected AAD</strong>
+              <div class="result-value">
+                <span id="meanAAD">--</span> ± <span id="stdDev">--</span>
+              </div>
+              <small>Mean ± SD (mm)</small>
+            </div>
+
+            <!-- Normal Range (+/- 2SD) -->
+            <div class="result-card">
+              <strong>Normal Range</strong>
+              <div class="result-value" id="normalRange">--</div>
+              <small>±2 SD (mm)</small>
+            </div>
+          </div>
+
+          <!-- Clinical Interpretation - Removed for sophisticated users -->
+          <!-- <div class="z-interpretation" id="zInterpretation" style="display: none">
+            Clinical interpretation will be added here
+          </div> -->
+
+          <!-- Documentation Actions -->
+          <div class="documentation-actions" id="documentationActions" style="margin-top: 1.5rem; display: none;">
+            <div style="text-align: center;">
+              <button type="button" class="outline" id="copyResultsBtn">
+                📋 Copy Results
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Adjustment Form Section -->
+      <section>
+        <article>
+          <header>
+            <h2>Adjust Parameters</h2>
+            <p><small>Modify values below to recalculate</small></p>
+          </header>
+
+          <!-- Units Toggle - INSIDE the form -->
+          <form class="calculator-form" id="adjustmentForm" action="/results/" method="GET">
+            <div class="grid">
+              <!-- Sex Selection -->
+              <div>
+                <label for="sex">
+                  Sex
+                  <select id="sex" name="sex" required>
+                    <option value="">Select sex...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <!-- Age Input -->
+            <div class="form-section">
+              <label for="age">Age</label>
+              <div class="grid">
+                <div>
+                  <select id="age-unit" name="ageUnit" class="age-unit-select">
+                    <option value="years" selected>years</option>
+                    <option value="months">months</option>
+                    <option value="weeks">weeks</option>
+                    <option value="days">days</option>
+                  </select>
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    id="age-value"
+                    name="age"
+                    min="0"
+                    step="0.1"
+                    placeholder="Enter age"
+                    required
+                  />
+                </div>
+              </div>
+              <span class="conversion" id="age-conversion"></span>
+            </div>
+            <div class="form-section">
+            <!-- Units Toggle -->
+              <fieldset>
+                <legend>Units:</legend>
+                <input
+                  type="radio"
+                  name="units"
+                  value="metric"
+                  id="metric"
+                  checked
+                />
+                <label htmlFor="metric">Metric</label>
+                <input
+                  type="radio"
+                  name="units"
+                  value="imperial"
+                  id="imperial"
+                />
+                <label htmlFor="imperial">Imperial</label>
+              </fieldset>
+            </div>
+            <div class="grid">
+              <!-- Height Input -->
+              <div>
+                <label for="height"
+                  >Height
+                  <span class="unit-in-label" id="height-unit-label"
+                    >(cm)</span
+                  ></label
+                >
+                <div class="input-with-conversion">
+                  <input
+                    type="number"
+                    id="height"
+                    name="height"
+                    min="30"
+                    step="0.1"
+                    placeholder="Height in cm"
+                    required
+                  />
+                  <span class="conversion" id="height-conversion"></span>
+                </div>
+              </div>
+
+              <!-- Weight Input -->
+              <div>
+                <label for="weight"
+                  >Weight
+                  <span class="unit-in-label" id="weight-unit-label"
+                    >(kg)</span
+                  ></label
+                >
+                <div class="input-with-conversion">
+                  <input
+                    type="number"
+                    id="weight"
+                    name="weight"
+                    min="1.3"
+                    step="0.1"
+                    placeholder="Weight in kg"
+                    required
+                  />
+                  <span class="conversion" id="weight-conversion"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Measured Aortic Annulus Input -->
+            <div class="form-section">
+              <label for="measuredAAD">
+                Measured Aortic Annulus Diameter (mm)
+                <input
+                  type="number"
+                  id="measuredAAD"
+                  name="measuredAAD"
+                  step="0.1"
+                  placeholder="Enter measured AAD in mm"
+                />
+              </label>
+            </div>
+            <!-- Submit Button -->
+            <div class="submit-section">
+              <button type="submit" class="submit-button" id="submitBtn">
+                Recalculate Z-Score
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <!-- Error Display -->
+      <div
+        class="error-message"
+        id="errorMessage"
+        style="display: none"
+        role="alert"
+      >
+        <span class="error-icon" aria-hidden="true">⚠</span>
+        <span id="errorText"></span>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container">
+      <small>
+        <p>
+          <em>For clinical decision support only. Always verify with institutional protocols.</em>
+        </p>
+      </small>
+    </footer>
+
+    <!-- Navigation Helper - Removed as redundant -->
+    <!-- Browser back button + adjustment form below covers all use cases -->
+
+    <!-- Lightweight Results Calculator (standalone) -->
+    <script src="../js/results-calculator.js"></script>
+    <script src="../js/version.js"></script>
+    
+    <!-- Enhanced Form Utils (handles form behavior consistently) -->
+    <script type="module" src="../js/enhanced-form-utils.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+      // Service Worker Registration for PWA functionality
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => {
+              console.log("✅ SW registered: ", registration);
+
+              // Update status indicator
+              const statusText = document.querySelector('#statusText');
+              const statusIndicator = document.querySelector('#statusIndicator');
+
+              if (statusText && statusIndicator) {
+                statusText.textContent = "Ready (offline available)";
+                statusIndicator.style.color = "#28a745"; // Green
+              }
+
+              // Check for updates
+              registration.addEventListener("updatefound", () => {
+                console.log("🔄 New service worker available");
+                const newWorker = registration.installing;
+
+                newWorker.addEventListener("statechange", () => {
+                  if (
+                    newWorker.state === "installed" &&
+                    navigator.serviceWorker.controller
+                  ) {
+                    // New update available
+                    console.log("📱 New app version available");
+                    if (statusText) {
+                      statusText.textContent = "Update available - reload page";
+                      statusIndicator.style.color = "#ffc107"; // Yellow
+                    }
+                  }
+                });
+              });
+            })
+            .catch((registrationError) => {
+              console.log("❌ SW registration failed: ", registrationError);
+
+              // Update status indicator
+              const statusText = document.querySelector('#statusText');
+              const statusIndicator = document.querySelector('#statusIndicator');
+
+              if (statusText && statusIndicator) {
+                statusText.textContent = "Online only";
+                statusIndicator.style.color = "#ffc107"; // Yellow
+              }
+            });
+        });
+      } else {
+        console.log("❌ Service workers not supported");
+
+        // Update status for unsupported browsers
+        const statusText = document.querySelector('#statusText');
+        const statusIndicator = document.querySelector('#statusIndicator');
+
+        if (statusText && statusIndicator) {
+          statusText.textContent = "Online only";
+          statusIndicator.style.color = "#6c757d"; // Gray
+        }
+      }
+    </script>
+
+    <!-- Results Page Logic -->
+    <script type="module">
+      // Results Page Logic - Simplified since form utils handle the rest
+      class ResultsManager {
+        constructor() {
+          this.urlParams = new URLSearchParams(window.location.search);
+          this.calculator = new ResultsCalculator();
+          this.init();
+        }
+
+        async init() {
+          this.setupDocumentationActions();
+          await this.loadModelAndCalculate();
+        }
+
+        async loadModelAndCalculate() {
+          try {
+            // Load the model
+            await this.calculator.loadModel();
+            
+            // Update status indicator
+            const statusText = document.querySelector('#statusText');
+            const statusIndicator = document.querySelector('#statusIndicator');
+            if (statusText && statusIndicator) {
+              statusText.textContent = "Model ready";
+              statusIndicator.style.color = "var(--pico-primary)";
+            }
+            
+            // Calculate and display results
+            this.calculateAndDisplayResults();
+            
+          } catch (error) {
+            console.error('Failed to load model or calculate:', error);
+            
+            // Update status indicator for error
+            const statusText = document.querySelector('#statusText');
+            const statusIndicator = document.querySelector('#statusIndicator');
+            if (statusText && statusIndicator) {
+              statusText.textContent = "Model load failed";
+              statusIndicator.style.color = "#dc3545"; // Red
+            }
+            
+            this.showError('Failed to load calculation model: ' + error.message);
+          }
+        }
+
+        calculateAndDisplayResults() {
+          try {
+            // Get canonical values using the form controller
+            const values = window.formController ? 
+              window.formController.getCanonicalValues() : 
+              this.getCanonicalValuesFromURL();
+            
+            if (!values.sex || values.age <= 0 || values.height <= 0 || values.weight <= 0) {
+              throw new Error('Invalid input parameters');
+            }
+
+            // Calculate using the lightweight calculator
+            const result = this.calculator.calculateResults(
+              values.age, 
+              values.weight, 
+              values.height, 
+              values.sex, 
+              values.measuredAAD
+            );
+            
+            this.displayResults(result);
+            
+          } catch (error) {
+            console.error('Calculation error:', error);
+            this.showError('Failed to calculate results: ' + error.message);
+          }
+        }
+
+        // Fallback method if form controller isn't ready yet
+        getCanonicalValuesFromURL() {
+          const age = parseFloat(this.urlParams.get('age')) || 0;
+          const ageUnit = this.urlParams.get('ageUnit') || 'years';
+          const height = parseFloat(this.urlParams.get('height')) || 0;
+          const weight = parseFloat(this.urlParams.get('weight')) || 0;
+          const units = this.urlParams.get('units') || 'metric';
+          const sex = this.urlParams.get('sex');
+          const measuredAAD = parseFloat(this.urlParams.get('measuredAAD')) || null;
+
+          // Simple conversions (duplicating from Conversions for fallback)
+          const ageInYears = ageUnit === 'years' ? age : 
+                            ageUnit === 'months' ? age/12 :
+                            ageUnit === 'weeks' ? age/52.18 :
+                            age/365.25;
+
+          return {
+            age: ageInYears,
+            height: units === 'metric' ? height : height * 2.54,
+            weight: units === 'metric' ? weight : weight / 2.20462,
+            sex: sex,
+            measuredAAD: measuredAAD
+          };
+        }
+
+        displayResults(result) {
+          // Hide loading state and show results
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('resultGrid').style.display = 'grid';
+          document.getElementById('documentationActions').style.display = 'block';
+
+          // Update result cards
+          if (result.zScore !== null) {
+            document.getElementById('zScoreValue').textContent = result.zScore.toFixed(2);
+          } else {
+            document.getElementById('zScoreValue').textContent = '--';
+          }
+          
+          document.getElementById('meanAAD').textContent = result.meanAAD.toFixed(1);
+          document.getElementById('stdDev').textContent = result.stdDev.toFixed(2);
+          document.getElementById('normalRange').textContent = `${result.lowerBound.toFixed(1)} - ${result.upperBound.toFixed(1)}`;
+
+          // No clinical interpretation - users are sophisticated enough to interpret Z-scores themselves
+        }
+
+        setupDocumentationActions() {
+          document.getElementById('copyResultsBtn')?.addEventListener('click', () => {
+            this.copyResultsToClipboard();
+          });
+        }
+
+        copyResultsToClipboard() {
+          // Get display values from URL (what user actually entered)
+          const sex = this.urlParams.get('sex') || 'Not specified';
+          const ageDisplay = `${this.urlParams.get('age')} ${this.urlParams.get('ageUnit') || 'years'}`;
+          const units = this.urlParams.get('units') || 'metric';
+          const heightDisplay = `${this.urlParams.get('height')} ${units === 'metric' ? 'cm' : 'in'}`;
+          const weightDisplay = `${this.urlParams.get('weight')} ${units === 'metric' ? 'kg' : 'lbs'}`;
+          const measuredAAD = this.urlParams.get('measuredAAD');
+          
+          const zScore = document.getElementById('zScoreValue').textContent;
+          const meanAAD = document.getElementById('meanAAD').textContent;
+          const stdDev = document.getElementById('stdDev').textContent;
+          const normalRange = document.getElementById('normalRange').textContent;
+
+          const text = `
+GRONINGEN AOV Z-SCORE CALCULATION
+
+Patient Parameters:
+- Sex: ${sex.charAt(0).toUpperCase() + sex.slice(1)}
+- Age: ${ageDisplay}
+- Height: ${heightDisplay}
+- Weight: ${weightDisplay}
+${measuredAAD ? `- Measured AAD: ${measuredAAD} mm` : ''}
+
+Results:
+${zScore !== '--' ? `- Z-Score: ${zScore}` : ''}
+- Expected AAD: ${meanAAD} ± ${stdDev} mm
+- Normal Range (±2SD): ${normalRange} mm
+
+Generated: ${new Date().toLocaleString()}
+Source: Groningen GAM model | University of Groningen
+URL: ${window.location.href}
+          `.trim();
+
+          navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('copyResultsBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => {
+              btn.textContent = originalText;
+            }, 2000);
+          }).catch(() => {
+            alert('Failed to copy to clipboard');
+          });
+        }
+
+        showError(message) {
+          // Hide loading state
+          document.getElementById('loadingState').style.display = 'none';
+          
+          const errorDiv = document.getElementById('errorMessage');
+          const errorText = document.getElementById('errorText');
+          if (errorDiv && errorText) {
+            errorText.textContent = message;
+            errorDiv.style.display = 'flex';
+          }
+        }
+      }
+
+      // Initialize when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        new ResultsManager();
+      });
+    </script>
+  </body>
+</html>

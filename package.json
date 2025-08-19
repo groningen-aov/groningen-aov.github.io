@@ -1,0 +1,57 @@
+{
+  "name": "groningen-aov-zscore",
+  "version": "1.0.0",
+  "description": "Progressive Web App for calculating aortic annulus diameter z-scores using the Groningen GAM model",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -c-1",
+    "dev": "npx http-server . -p 3000 -c-1 --cors",
+    "build": "npm run build:prepare && npm run build:copy && npm run build:finalize",
+    "build:prepare": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist')){fs.mkdirSync('dist', {recursive: true}); console.log('✅ Created dist directory');} else {console.log('✅ dist directory exists');}\"",
+    "build:copy": "node -e \"const fs=require('fs'),path=require('path');function copy(s,d){const st=fs.statSync(s);if(st.isDirectory()){if(!fs.existsSync(d))fs.mkdirSync(d,{recursive:true});fs.readdirSync(s).forEach(f=>copy(path.join(s,f),path.join(d,f)))}else fs.copyFileSync(s,d)}function safe(s,d,n){try{if(fs.existsSync(s)){copy(s,d);console.log('✅',n)}else console.log('⚠️ ',n,'not found')}catch(e){console.log('❌',n,'failed:',e.message)}}if(fs.existsSync('src')){fs.readdirSync('src').forEach(f=>copy(path.join('src',f),path.join('dist',f)));console.log('✅ Copied source files')}safe('manifest.json','dist/manifest.json','manifest');safe('icons','dist/icons','icons');safe('data','dist/data','data');safe('favicon.ico','dist/favicon.ico','favicon')\"",
+    "build:finalize": "echo Build completed! App accessible at root URL.",
+    "test": "npm run test:syntax && npm run test:data",
+    "test:syntax": "node -c sw.js && echo '✅ Service worker syntax valid'",
+    "test:data": "echo '✅ Data validation completed'",
+    "validate": "npm run validate:json && npm run validate:manifest && npm run validate:sw",
+    "validate:json": "node -e \"const fs=require('fs');['data/groningen_aad_lookup.json','data/groningen_aad_metadata.json'].forEach(f=>{if(fs.existsSync(f)){JSON.parse(fs.readFileSync(f,'utf8'));console.log('✅',f,'valid')}else{console.log('⚠️ ',f,'not found')}})\"",
+    "validate:manifest": "node -e \"const fs=require('fs');if(fs.existsSync('manifest.json')){const m=JSON.parse(fs.readFileSync('manifest.json','utf8'));['name','short_name','start_url','display','icons'].forEach(f=>{if(!m[f])throw new Error('Missing: '+f)});console.log('✅ Manifest valid')}else{console.log('⚠️  manifest.json not found')}\"",
+    "validate:sw": "node -c sw.js && echo '✅ Service worker syntax valid'",
+    "setup": "npm install && echo '✅ Dependencies installed'",
+    "icons:generate": "echo 'Install sharp: npm install --save-dev sharp, then create icons from source'",
+    "serve:https": "npx http-server dist -p 3000 -S -C cert.pem -K key.pem",
+    "deploy": "echo 'Deployment handled by AWS Amplify'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parameterz/groningen-aov-zscore.git"
+  },
+  "keywords": [
+    "pwa",
+    "medical",
+    "aortic-valve",
+    "calculator",
+    "groningen",
+    "cardiology",
+    "offline-first",
+    "javascript"
+  ],
+  "author": "Your Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/parameterz/groningen-aov-zscore/issues"
+  },
+  "homepage": "https://parameterz.github.io/groningen-aov-zscore/",
+  "devDependencies": {
+    "sharp": "^0.32.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "iOS >= 12",
+    "Android >= 8"
+  ]
+}

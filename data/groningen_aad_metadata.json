@@ -1,0 +1,105 @@
+{
+  "metadata": {
+    "description": ["Groningen AAD prediction model - interpolation grid"],
+    "source": ["University of Groningen, Gerton Lunter et al."],
+    "max_z_error": [0.108],
+    "created_date": ["2025-08-04"],
+    "total_grid_points": [12672]
+  },
+  "dimensions": {
+    "n_weight": [16],
+    "n_height": [11],
+    "n_age": [36],
+    "n_sex": [2]
+  },
+  "grid_info": {
+    "n_logweight_points": [16],
+    "n_sqrtheight_points": [11],
+    "n_logage_points": [36],
+    "logweight_range": [0.3, 5.9],
+    "sqrtheight_range": [5.5, 15.4],
+    "logage_range": [0, 4.1]
+  },
+  "test_cases": [
+    {
+      "description": "Gerton's example - 40yo male, 70kg, 170cm",
+      "age": 40,
+      "weight": 70,
+      "height": 170,
+      "sex": 0,
+      "expected_aad": 22.908,
+      "expected_sd": 1.75,
+      "z_score_for_aad_20": -1.661
+    },
+    {
+      "description": "Newborn - 1 day old, 3kg, 50cm, female",
+      "age": 0.003,
+      "weight": 3,
+      "height": 50,
+      "sex": 1,
+      "expected_aad": 5.978,
+      "expected_sd": 0.924,
+      "z_score_for_aad_20": 15.17
+    },
+    {
+      "description": "Toddler - 2yo, 12kg, 85cm, male",
+      "age": 2,
+      "weight": 12,
+      "height": 85,
+      "sex": 0,
+      "expected_aad": 11.491,
+      "expected_sd": 1.134,
+      "z_score_for_aad_20": 7.503
+    },
+    {
+      "description": "Child - 10yo, 35kg, 140cm, female",
+      "age": 10,
+      "weight": 35,
+      "height": 140,
+      "sex": 1,
+      "expected_aad": 15.544,
+      "expected_sd": 1.454,
+      "z_score_for_aad_20": 3.064
+    },
+    {
+      "description": "Teenager - 16yo, 65kg, 175cm, male",
+      "age": 16,
+      "weight": 65,
+      "height": 175,
+      "sex": 0,
+      "expected_aad": 19.999,
+      "expected_sd": 1.725,
+      "z_score_for_aad_20": 0.001
+    },
+    {
+      "description": "Adult female - 25yo, 55kg, 165cm",
+      "age": 25,
+      "weight": 55,
+      "height": 165,
+      "sex": 1,
+      "expected_aad": 19.568,
+      "expected_sd": 1.673,
+      "z_score_for_aad_20": 0.258
+    },
+    {
+      "description": "Older adult - 55yo, 90kg, 180cm, male",
+      "age": 55,
+      "weight": 90,
+      "height": 180,
+      "sex": 0,
+      "expected_aad": 24.918,
+      "expected_sd": 1.739,
+      "z_score_for_aad_20": -2.828
+    },
+    {
+      "description": "Edge case - very small adult, 50kg, 155cm, female",
+      "age": 30,
+      "weight": 50,
+      "height": 155,
+      "sex": 1,
+      "expected_aad": 19.229,
+      "expected_sd": 1.677,
+      "z_score_for_aad_20": 0.46
+    }
+  ]
+}

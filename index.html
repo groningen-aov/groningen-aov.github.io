@@ -1,10 +1,303 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Groningen AOV</title>
-</head>
-<body>
-    <h1>Welcome to Groningen AOV</h1>
-    <p>Coming soon...</p>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Groningen AOV Z-Score Calculator</title>
+    <meta
+      name="description"
+      content="Clinical calculator for Aortic Valve diameter Z-scores using the Groningen GAM model"
+    />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2060df" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AOV Z-Score" />
+
+    <!-- Pico.css Blue Theme -->
+    <link rel="stylesheet" href="./style/pico.blue.min.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./style/style.css" />
+
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="container-fluid">
+      <ul>
+        <li><a href="/" class="secondary">Home</a></li>
+        <li><a href="/about/" class="secondary">About</a></li>
+        <li><a href="/test/" class="secondary">Test</a></li>
+        <li>
+          <div class="status">
+            <span class="status-indicator" style="color: var(--pico-primary)"
+              >●</span
+            >
+            <span>Ready</span>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main container -->
+    <main class="container">
+      <!-- Header -->
+      <header class="calculator-header">
+        <hgroup>
+          <h1>Groningen AAD Z-Score</h1>
+          <p>
+            Calculate aortic annulus diameter z-scores using the Groningen GAM
+            model
+          </p>
+        </hgroup>
+      </header>
+
+      <!-- Input Form Section -->
+      <section>
+        <article>
+          <header>
+            <h2>Patient Information</h2>
+          </header>
+
+          <form
+            class="calculator-form"
+            id="calculatorForm"
+            action="/results/"
+            method="GET"
+          >
+            <div class="grid">
+              <!-- Sex Selection -->
+              <div>
+                <label for="sex">
+                  Sex
+                  <select id="sex" name="sex" required>
+                    <option value="">Select sex...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <!-- Age Input -->
+            <div class="form-section">
+              <label for="age">Age</label>
+              <div class="grid">
+                <div>
+                  <select id="age-unit" name="ageUnit" class="age-unit-select">
+                    <option value="years" selected>years</option>
+                    <option value="months">months</option>
+                    <option value="weeks">weeks</option>
+                    <option value="days">days</option>
+                  </select>
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    id="age-value"
+                    name="age"
+                    min="0"
+                    step="0.1"
+                    placeholder="Enter age"
+                    required
+                  />
+                </div>
+              </div>
+              <span class="conversion" id="age-conversion"></span>
+            </div>
+            <div class="form-section">
+            <!-- Units Toggle -->
+              <fieldset>
+                <legend>Units:</legend>
+                <input
+                  type="radio"
+                  name="units"
+                  value="metric"
+                  id="metric"
+                  checked
+                />
+                <label htmlFor="metric">Metric</label>
+                <input
+                  type="radio"
+                  name="units"
+                  value="imperial"
+                  id="imperial"
+                />
+                <label htmlFor="imperial">Imperial</label>
+              </fieldset>
+            </div>
+            <div class="grid">
+              <!-- Height Input -->
+              <div>
+                <label for="height"
+                  >Height
+                  <span class="unit-in-label" id="height-unit-label"
+                    >(cm)</span
+                  ></label
+                >
+                <div class="input-with-conversion">
+                  <input
+                    type="number"
+                    id="height"
+                    name="height"
+                    min="30"
+                    step="0.1"
+                    placeholder="Height in cm"
+                    required
+                  />
+                  <span class="conversion" id="height-conversion"></span>
+                </div>
+              </div>
+
+              <!-- Weight Input -->
+              <div>
+                <label for="weight"
+                  >Weight
+                  <span class="unit-in-label" id="weight-unit-label"
+                    >(kg)</span
+                  ></label
+                >
+                <div class="input-with-conversion">
+                  <input
+                    type="number"
+                    id="weight"
+                    name="weight"
+                    min="1.3"
+                    step="0.1"
+                    placeholder="Weight in kg"
+                    required
+                  />
+                  <span class="conversion" id="weight-conversion"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Measured Aortic Annulus Input -->
+            <div class="form-section">
+              <label for="measuredAAD">
+                Measured Aortic Annulus Diameter (mm)
+                <input
+                  type="number"
+                  id="measuredAAD"
+                  name="measuredAAD"
+                  step="0.1"
+                  placeholder="Enter measured AAD in mm"
+                />
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+              <button type="submit" class="submit-button" id="submitBtn">
+                Calculate Z-Score
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <!-- Error Display -->
+      <div
+        class="error-message"
+        id="errorMessage"
+        style="display: none"
+        role="alert"
+      >
+        <span class="error-icon" aria-hidden="true">⚠</span>
+        <span id="errorText"></span>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container">
+      <small>
+        <p>
+          <em
+            >For clinical decision support only. Always verify with
+            institutional protocols.</em
+          >
+        </p>
+      </small>
+    </footer>
+
+    <!-- Load enhanced form utilities -->
+    <script type="module" src="./js/enhanced-form-utils.js"></script>
+
+    <!-- Version management -->
+    <script src="./js/version.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+      // Service Worker Registration for PWA functionality
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => {
+              console.log("✅ SW registered: ", registration);
+
+              // Update status indicator
+              const statusText = document.querySelector(
+                ".status span:last-child"
+              );
+              const statusIndicator =
+                document.querySelector(".status-indicator");
+
+              if (statusText && statusIndicator) {
+                statusText.textContent = "Ready (offline available)";
+                statusIndicator.style.color = "#28a745"; // Green
+              }
+
+              // Check for updates
+              registration.addEventListener("updatefound", () => {
+                console.log("🔄 New service worker available");
+                const newWorker = registration.installing;
+
+                newWorker.addEventListener("statechange", () => {
+                  if (
+                    newWorker.state === "installed" &&
+                    navigator.serviceWorker.controller
+                  ) {
+                    // New update available
+                    console.log("📱 New app version available");
+                    if (statusText) {
+                      statusText.textContent = "Update available - reload page";
+                      statusIndicator.style.color = "#ffc107"; // Yellow
+                    }
+                  }
+                });
+              });
+            })
+            .catch((registrationError) => {
+              console.log("❌ SW registration failed: ", registrationError);
+
+              // Update status indicator
+              const statusText = document.querySelector(
+                ".status span:last-child"
+              );
+              const statusIndicator =
+                document.querySelector(".status-indicator");
+
+              if (statusText && statusIndicator) {
+                statusText.textContent = "Online only";
+                statusIndicator.style.color = "#ffc107"; // Yellow
+              }
+            });
+        });
+      } else {
+        console.log("❌ Service workers not supported");
+
+        // Update status for unsupported browsers
+        const statusText = document.querySelector(".status span:last-child");
+        const statusIndicator = document.querySelector(".status-indicator");
+
+        if (statusText && statusIndicator) {
+          statusText.textContent = "Online only";
+          statusIndicator.style.color = "#6c757d"; // Gray
+        }
+      }
+    </script>
+  </body>
 </html>

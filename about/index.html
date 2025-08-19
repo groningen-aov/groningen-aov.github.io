@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - Groningen AAD Calculator</title>
+    <meta
+      name="description"
+      content="About the Groningen GAM model for aortic annulus diameter prediction"
+    />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2060df" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AOV About" />
+
+    <!-- Pico.css Blue Theme -->
+    <link rel="stylesheet" href="../style/pico.blue.min.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../style/style.css" />
+
+    <link rel="manifest" href="../manifest.json" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="container-fluid">
+      <ul>
+        <li><a href="/" class="secondary">Home</a></li>
+        <li><a href="/about/" class="secondary">About</a></li>
+        <li><a href="/test/" class="secondary">Test</a></li>
+        <li>
+          <div class="status">
+            <span class="status-indicator" style="color: var(--pico-primary);">●</span>
+            <span>Ready</span>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main container -->
+    <main class="container">
+      <!-- Header -->
+      <header>
+        <hgroup>
+          <h1> About the Groningen AOV Model</h1>
+          <p>
+            Predicting aortic annulus diameter from demographic and anthropometric data
+          </p>
+        </hgroup>
+      </header>
+
+      <!-- Model Overview -->
+      <section>
+        <article>
+          <header>
+            <h2>Model Overview</h2>
+          </header>
+          
+          <p>
+            The Groningen GAM (Generalized Additive Model) for aortic annulus diameter prediction 
+            is based on comprehensive analysis of <strong>75,142 cardiac-healthy organ donor records</strong> 
+            spanning from 1985 to 2016.
+          </p>
+
+          <h3>Key Features</h3>
+          <ul>
+            <li><strong>Large Dataset:</strong> 75,142 donor records across all age groups (0-60 years)</li>
+            <li><strong>Modern Methodology:</strong> Generalized Additive Model with trilinear interpolation</li>
+            <li><strong>Comprehensive Coverage:</strong> Extends existing calculators limited to pediatric populations</li>
+            <li><strong>Contemporary Relevance:</strong> Addresses obesity epidemic by eliminating BSA constraints</li>
+          </ul>
+        </article>
+      </section>
+
+      <!-- Research Background -->
+      <section>
+        <article>
+          <header>
+            <h2>Research Background</h2>
+          </header>
+
+          <h3>Publication</h3>
+          <blockquote>
+            <strong>"Modeling the expected aortic annulus diameter from 75,142 donor records: 
+            a new standard for normalization in children and adults."</strong>
+            <br><br>
+            <em>Authors:</em> Joost P van Melle<sup>1</sup>*, Leah Dijkshoorn<sup>2</sup>*, Marco A Grzegorczyk<sup>2</sup>, Dan Dyar<sup>3</sup>, 
+            Tjark Ebels<sup>4</sup>, Gerton Lunter<sup>5</sup>
+            <br>
+            <small>*These authors contributed equally</small>
+          </blockquote>
+
+          <h3>Institutional Affiliations</h3>
+          <ol>
+            <li><strong>Department of Cardiology</strong> - University Medical Centre Groningen</li>
+            <li><strong>Statistics and Probability Group</strong> - Bernoulli Institute, University of Groningen</li>
+            <li><strong>Department of Cardiology</strong> - University of California, San Diego</li>
+            <li><strong>Department of Cardiothoracic Surgery</strong> - University Medical Center Groningen</li>
+            <li><strong>Department of Epidemiology</strong> - University Medical Centre Groningen</li>
+          </ol>
+        </article>
+      </section>
+
+      <!-- Clinical Applications -->
+      <section>
+        <article>
+          <header>
+            <h2>Clinical Applications</h2>
+          </header>
+
+          <h3>Primary Use Cases</h3>
+          <ul>
+            <li><strong>Aortic Valve Replacement:</strong> Selecting appropriate prosthesis size</li>
+            <li><strong>Congenital Heart Surgery:</strong> Planning reconstructive procedures</li>
+            <li><strong>Research Applications:</strong> Normalizing measurements across populations</li>
+            <li><strong>Quality Assurance:</strong> Validating echocardiographic measurements</li>
+          </ul>
+
+          <h3>Model Inputs</h3>
+          <ul>
+            <li><strong>Age:</strong> 0-59 years (supports days, weeks, months, years)</li>
+            <li><strong>Weight:</strong> 1.34-352 kg</li>
+            <li><strong>Height:</strong> 30-236 cm</li>
+            <li><strong>Sex:</strong> Male or Female</li>
+            <li><strong>Measured AAD:</strong> for Z-score calculation</li>
+          </ul>
+
+          <h3>Model Outputs</h3>
+          <ul>
+            <li><strong>Expected AAD:</strong> Predicted mean diameter (mm)</li>
+            <li><strong>Standard Deviation:</strong> Population variability (mm)</li>
+            <li><strong>Normal Range:</strong> ±2 standard deviations</li>
+            <li><strong>Z-Score:</strong> When measured value provided</li>
+          </ul>
+        </article>
+      </section>
+
+      <!-- Technical Implementation -->
+      <section>
+        <article>
+          <header>
+            <h2>Technical Implementation</h2>
+          </header>
+
+          <h3>Model Architecture</h3>
+          <p>
+            The calculator implements the original R-based GAM model using JavaScript with 
+            trilinear interpolation across a pre-computed grid of predictions. This approach 
+            ensures mathematical consistency with the original research while providing 
+            fast, offline-capable calculations.
+          </p>
+
+          <h3>Data Transformations</h3>
+          <ul>
+            <li><strong>Weight:</strong> log(weight) transformation</li>
+            <li><strong>Height:</strong> sqrt(height) transformation</li>
+            <li><strong>Age:</strong> log(age + 1) transformation</li>
+          </ul>
+
+          <h3>Quality Assurance</h3>
+          <p>
+            All calculations are validated against the original R model with comprehensive 
+            test cases spanning the full range of input parameters. The implementation 
+            maintains precision within 0.001 tolerance of the reference implementation.
+          </p>
+        </article>
+      </section>
+
+      <!-- Limitations and Considerations -->
+      <section>
+        <article>
+          <header>
+            <h2>Limitations and Considerations</h2>
+          </header>
+
+          <h3>Clinical Limitations</h3>
+          <ul>
+            <li><strong>Population Basis:</strong> Based on cardiac-healthy organ donors</li>
+            <li><strong>Age Range:</strong> Limited to 0-59 years</li>
+            <li><strong>Geographic Scope:</strong> Derived from donor population (geographic distribution not specified)</li>
+            <li><strong>Decision Support:</strong> For clinical decision support only, not diagnostic</li>
+          </ul>
+
+          <h3>Technical Considerations</h3>
+          <ul>
+            <li><strong>Interpolation Accuracy:</strong> Results are interpolated from grid points</li>
+            <li><strong>Boundary Conditions:</strong> Extreme values may have reduced accuracy</li>
+            <li><strong>Model Assumptions:</strong> GAM assumptions apply to predictions</li>
+          </ul>
+
+          <div style="background: var(--pico-muted-background-color); padding: 1rem; border-radius: var(--pico-border-radius); margin-top: 1rem;">
+            <strong>Important:</strong> This calculator is intended for clinical decision support only. 
+            Always verify results with institutional protocols and consider individual patient factors 
+            when making clinical decisions.
+          </div>
+        </article>
+      </section>
+
+      <!-- PWA Features -->
+      <section>
+        <article>
+          <header>
+            <h2>Application Features</h2>
+          </header>
+
+          <h3>Progressive Web App</h3>
+          <ul>
+            <li><strong>Offline Capability:</strong> Works without internet connection after initial load</li>
+            <li><strong>Mobile Optimized:</strong> Responsive design for tablets and smartphones</li>
+            <li><strong>Installable:</strong> Can be installed on device home screen</li>
+            <li><strong>Fast Loading:</strong> Cached resources for instant startup</li>
+          </ul>
+
+          <h3>Privacy and Security</h3>
+          <ul>
+            <li><strong>No Data Collection:</strong> No patient data is transmitted or stored</li>
+            <li><strong>Local Processing:</strong> All calculations performed on device</li>
+            <li><strong>Open Source:</strong> Transparent implementation available for review</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container">
+      <small>
+        <p>
+          <em>For clinical decision support only. Always verify with institutional protocols.</em>
+        </p>
+      </small>
+    </footer>
+
+    <!-- Version management -->
+    <script src="../js/version.js"></script>
+  </body>
+</html>

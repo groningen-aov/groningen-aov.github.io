@@ -1,0 +1,1015 @@
+/* =================================================================
+   GRONINGEN AOV CALCULATOR - CUSTOM STYLES FOR PICO.CSS
+   =================================================================
+   This file provides custom styling that complements Pico.css
+   for the medical calculator interface.
+   ================================================================= */
+
+/* ===== CUSTOM PROPERTIES ===== */
+:root {
+  /* Medical/Clinical color palette */
+  --medical-success: var(--pico-ins-color);
+  --medical-warning: #f59e0b;
+  --medical-error: var(--pico-del-color);
+  --medical-info: var(--pico-primary);
+  
+  /* Status indicator colors */
+  --status-loading: var(--medical-warning);
+  --status-ready: var(--medical-success);
+  --status-error: var(--medical-error);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== NAVIGATION & STATUS ===== */
+nav .status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pico-muted-color);
+}
+
+.status-indicator {
+  font-size: 1rem;
+  transition: color var(--pico-transition);
+}
+
+.status.loading .status-indicator {
+  color: var(--status-loading);
+  animation: pulse 2s infinite;
+}
+
+.status.ready .status-indicator {
+  color: var(--status-ready);
+}
+
+.status.error .status-indicator {
+  color: var(--status-error);
+}
+
+/* ===== HEADER ===== */
+.calculator-header {
+  text-align: center;
+  margin-bottom: var(--pico-typography-spacing-vertical);
+}
+
+.calculator-header hgroup {
+  margin-bottom: var(--pico-spacing);
+}
+
+/* ===== FORM STYLING ===== */
+.calculator-form {
+  margin-bottom: var(--pico-block-spacing-vertical);
+}
+
+/* Add these styles to your existing style.css */
+
+/* ===== ENHANCED FORM STYLES ===== */
+
+.units-toggle {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.units-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.age-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.age-unit-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f5f5;
+  min-width: 80px;
+}
+
+.age-value-input {
+  flex: 1;
+  min-width: 80px;
+}
+
+.input-with-conversion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conversion {
+  color: #666;
+  font-size: 0.85em;
+  font-style: italic;
+  margin-left: 4px;
+}
+
+.unit-label {
+  font-weight: 500;
+  color: #555;
+  min-width: 40px;
+}
+
+.form-section {
+  margin-bottom: 20px;
+}
+
+
+/* Mobile optimizations for enhanced form */
+@media (max-width: 575px) {
+  .units-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .age-input-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .age-unit-select {
+    min-width: auto;
+  }
+  
+  .input-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===== RESULTS SECTION ===== */
+.results {
+  margin-top: var(--pico-block-spacing-vertical);
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+
+.result-card {
+  background: var(--pico-card-sectioning-background-color);
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: var(--pico-spacing);
+  text-align: center;
+  transition: all var(--pico-transition);
+}
+
+.result-card:hover {
+  box-shadow: var(--pico-card-box-shadow);
+  transform: translateY(-1px);
+}
+
+/* Z-Score card with subtle emphasis - no blue background */
+.result-card.z-score-card {
+  border: calc(var(--pico-border-width) * 2) solid var(--pico-primary-border);
+  box-shadow: 0 0 0 1px var(--pico-primary-border);
+}
+
+.result-card.z-score-card:hover {
+  border-color: var(--pico-primary-hover-border);
+  box-shadow: 0 0 0 1px var(--pico-primary-hover-border), var(--pico-card-box-shadow);
+}
+
+/* Remove the old primary styling since we're not using it anymore */
+.result-card.primary {
+  border-color: var(--pico-primary-border);
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+}
+
+.result-card.primary small {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.result-card h6 {
+  margin-bottom: calc(var(--pico-spacing) * 0.5);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+.result-value {
+  font-size: 1.5rem;
+  font-weight: var(--pico-font-weight);
+  margin-bottom: calc(var(--pico-spacing) * 0.25);
+  color: var(--pico-color);
+  line-height: 1.2;
+}
+
+.result-card.primary .result-value {
+  color: var(--pico-primary-inverse);
+}
+
+/* Responsive grid */
+@media (min-width: 576px) {
+  .result-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .result-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== Z-SCORE CALCULATOR SECTION ===== */
+.z-score-section {
+  margin-top: var(--pico-spacing);
+}
+
+.z-score-section summary {
+  font-weight: 600;
+  color: var(--pico-primary);
+}
+
+.z-result {
+  margin-top: var(--pico-spacing);
+  padding: var(--pico-spacing);
+  background: var(--pico-card-sectioning-background-color);
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+}
+
+
+/* ===== ERROR HANDLING ===== */
+.error-message {
+  background: var(--pico-del-color);
+  color: var(--pico-background-color);
+  border: var(--pico-border-width) solid var(--pico-del-color);
+  border-radius: var(--pico-border-radius);
+  padding: var(--pico-spacing);
+  margin-top: var(--pico-spacing);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pico-spacing) * 0.5);
+  opacity: 0.95;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* ===== COMPONENT STATE MANAGEMENT ===== */
+.results[aria-hidden="true"] {
+  display: none;
+}
+
+.error-message[aria-hidden="true"] {
+  display: none;
+}
+
+.z-result[aria-hidden="true"] {
+  display: none;
+}
+
+.calculator-form.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.calculator-form.loading input,
+.calculator-form.loading select {
+  cursor: wait;
+}
+
+/* ===== MEDICAL DATA PRESENTATION ===== */
+mark {
+  background: var(--pico-mark-background-color);
+  color: var(--pico-mark-color);
+  padding: 0.125rem 0.25rem;
+  border-radius: calc(var(--pico-border-radius) * 0.5);
+}
+
+.result-card.primary mark {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--pico-primary-inverse);
+}
+
+/* ===== UTILITY CLASSES ===== */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Mobile optimizations */
+@media (max-width: 575px) {
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  nav ul li {
+    padding: calc(var(--pico-nav-element-spacing-vertical) * 0.5) 
+             var(--pico-nav-element-spacing-horizontal);
+  }
+}
+
+/* Mobile spacing optimizations */
+@media (max-width: 767px) {
+  /* Reduce vertical spacing between form sections */
+  .grid {
+    gap: 0.75rem;
+  }
+  
+  /* Tighter spacing in form */
+  .calculator-form {
+    margin-bottom: 1rem;
+  }
+  
+  /* Reduce spacing in grid containers */
+  section {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Make article padding more compact */
+  article {
+    margin-bottom: 1rem;
+  }
+  
+  /* Reduce header spacing */
+  .calculator-header {
+    margin-bottom: 1rem;
+  }
+  
+  .calculator-header hgroup {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 576px) {
+  .result-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .result-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== ACCESSIBILITY & PREFERENCES ===== */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .status-indicator,
+  .result-card,
+  .z-score-field span {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .result-card {
+    border-width: calc(var(--pico-border-width) * 2);
+  }
+  
+  .status-indicator {
+    font-weight: bold;
+  }
+}
+
+/* Dark mode adaptations */
+@media (prefers-color-scheme: dark) {
+  .z-interpretation.normal {
+    background: var(--pico-ins-color);
+    color: var(--pico-contrast-inverse);
+  }
+  
+  .z-interpretation.abnormal {
+    background: var(--pico-del-color);
+    color: var(--pico-contrast-inverse);
+  }
+}
+
+/* Focus management */
+.result-card:focus-within {
+  outline: var(--pico-outline-width) solid var(--pico-primary-focus);
+  outline-offset: var(--pico-outline-width);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .test-btn,
+  nav {
+    display: none;
+  }
+  
+  .results {
+    page-break-inside: avoid;
+  }
+  
+  .result-card {
+    border: 1px solid #000;
+    background: transparent;
+    color: #000;
+  }
+  
+  .result-card.primary {
+    background: #000;
+    color: #fff;
+  }
+}
+
+/* ===== RESULTS REVEAL ANIMATION ===== */
+.results {
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.results[aria-hidden="true"] {
+  display: none;
+}
+
+.results[aria-hidden="false"] {
+  display: block;
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Results appear more smoothly on mobile */
+@media (max-width: 767px) {
+  .results {
+    /* Ensure results don't get cut off on mobile */
+    margin-bottom: 2rem;
+  }
+}
+
+/* ===== CUSTOM FORM ELEMENTS ===== */
+/* ===== ENHANCED FORM STYLING - UX FIXES ===== */
+/* ===== ENHANCED FORM STYLING - UX FIXES ===== */
+
+
+/* 2. AGE INPUT - USING PICO GRID FOR CONSISTENCY */
+.form-section {
+  margin-bottom: var(--pico-spacing);
+}
+
+/* Age conversion spans full width below the grid */
+.form-section .conversion {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--pico-muted-color);
+  font-style: italic;
+}
+
+/* Remove default margins from grid items */
+.form-section .grid > div {
+  margin-bottom: 0;
+}
+
+/* 3. HEIGHT/WEIGHT INPUT STYLING - SIMPLIFIED WITH UNITS IN LABELS */
+.input-with-conversion {
+  position: relative;
+}
+
+/* Simple input styling - no attached unit badges */
+.input-with-conversion input {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* Unit information in label styling */
+.input-with-conversion label {
+  display: block;
+  margin-bottom: calc(var(--pico-spacing) * 0.375);
+}
+
+.unit-in-label {
+  font-weight: 600;
+  color: var(--pico-primary);
+  background: var(--pico-primary-background);
+  background: linear-gradient(135deg, var(--pico-primary) 0%, var(--pico-primary-hover) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 0.9em;
+}
+
+/* Conversion text positioning - directly below input */
+.input-with-conversion .conversion {
+  display: block;
+  margin-top: 0.375rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--pico-muted-color);
+  font-style: italic;
+  padding-left: 0.25rem;
+}
+
+/* 4. RESPONSIVE IMPROVEMENTS */
+
+/* Desktop: Better spacing and proportions */
+@media (min-width: 768px) {
+  /* Units toggle takes appropriate width */
+  .units-toggle {
+    width: fit-content;
+    min-width: 300px;
+  }
+  
+  /* Pico.css grid automatically handles all layouts on desktop */
+  /* Age: Equal columns (select + input) */
+  /* Height/Weight: Equal columns automatically */
+  /* No custom styling needed! */
+}
+
+/* Mobile: Ensure proper stacking and spacing */
+@media (max-width: 767px) {
+  .units-toggle {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .units-toggle > span {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .units-toggle label {
+    justify-content: center;
+  }
+  
+  /* Pico.css grid handles all responsive behavior automatically */
+  /* Age, Height, Weight all stack to single column on mobile */
+  
+  /* Just ensure conversion text spacing is good */
+  .input-with-conversion .conversion,
+  .form-section .conversion {
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* 5. FORM SECTION SPACING IMPROVEMENTS */
+.form-section + .form-section {
+  margin-top: calc(var(--pico-spacing) * 1.25);
+}
+
+/* Let Pico.css handle the grid layout for height/weight */
+/* Remove custom grid styling - Pico's .grid class handles this */
+
+/* Ensure proper spacing in Pico grid */
+.grid > div {
+  margin-bottom: 0;
+}
+
+/* Add bottom margin only to the grid container */
+.grid {
+  margin-bottom: var(--pico-spacing);
+}
+
+/* 6. VISUAL HIERARCHY IMPROVEMENTS */
+.units-toggle {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow var(--pico-transition);
+}
+
+.units-toggle:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Better visual connection between inputs and their conversions */
+.input-with-conversion {
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--pico-transition);
+}
+
+.input-with-conversion:focus-within {
+  border-bottom-color: var(--pico-primary);
+}
+
+/* 7. ACCESSIBILITY IMPROVEMENTS */
+.units-toggle label:focus-within {
+  outline: 2px solid var(--pico-primary-focus);
+  outline-offset: 2px;
+}
+
+.input-with-conversion input:focus {
+  box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-form-element-focus-color);
+}
+
+/* 8. LOADING STATE IMPROVEMENTS */
+.calculator-form.loading .units-toggle {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.calculator-form.loading .input-with-conversion {
+  opacity: 0.7;
+}
+
+/* 9. DARK MODE ADJUSTMENTS */
+@media (prefers-color-scheme: dark) {
+  .units-toggle {
+    background: var(--pico-card-background-color);
+    border-color: var(--pico-muted-border-color);
+  }
+  
+  .unit-in-label {
+    color: var(--pico-primary);
+  }
+}
+
+/**
+ * Simple Footer Styles for Groningen AOV Calculator
+ * Adds version styling to existing footer
+ */
+
+/* Version link styling */
+footer a {
+  color: var(--pico-primary);
+  text-decoration: none;
+  transition: color var(--pico-transition);
+}
+
+footer a:hover {
+  color: var(--pico-primary-hover);
+  text-decoration: underline;
+}
+
+/* Version Modal */
+.version-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.version-modal-content {
+  background-color: var(--pico-background-color);
+  border-radius: var(--pico-border-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  max-height: 80vh;
+  width: 90%;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+.version-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+  background-color: var(--pico-card-background-color);
+}
+
+.version-modal-header h3 {
+  margin: 0;
+  color: var(--pico-color);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--pico-muted-color);
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--pico-border-radius);
+  transition: all var(--pico-transition);
+}
+
+.close-btn:hover {
+  background-color: var(--pico-muted-background-color);
+  color: var(--pico-color);
+}
+
+.version-modal-body {
+  padding: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Version Entries */
+.version-entry {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.version-entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.version-entry.current {
+  margin: -0.5rem;
+  padding: 1rem;
+  border-radius: var(--pico-border-radius);
+  border: var(--pico-border-width) solid var(--pico-primary-border);
+}
+
+.version-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.version-header strong {
+  font-family: var(--pico-font-family-monospace);
+  color: var(--pico-primary);
+}
+
+.version-date {
+  color: var(--pico-muted-color);
+  font-size: 0.875rem;
+}
+
+.current-tag {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: calc(var(--pico-border-radius) * 0.5);
+  font-weight: 500;
+}
+
+.version-notes {
+  margin: 0.5rem 0;
+  color: var(--pico-color);
+  line-height: 1.4;
+}
+
+.version-features {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.25rem;
+}
+
+.version-features li {
+  margin-bottom: 0.25rem;
+  color: var(--pico-muted-color);
+  font-size: 0.875rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .version-modal-content {
+    width: 95%;
+    max-height: 85vh;
+  }
+  
+  .version-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+/* Ensure proper layout */
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* ====================================
+   SUBMIT BUTTON STYLING
+   ==================================== */
+
+/* Enhanced submit button styling */
+.submit-section {
+    margin-top: calc(var(--pico-spacing) * 1.5);
+    padding-top: var(--pico-spacing);
+    border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.submit-button {
+    width: 100%;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--pico-primary) 0%, var(--pico-primary-hover) 100%);
+    border: none;
+    border-radius: var(--pico-border-radius);
+    box-shadow: 0 4px 12px rgba(32, 96, 223, 0.25);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(32, 96, 223, 0.35);
+    background: linear-gradient(135deg, var(--pico-primary-hover) 0%, var(--pico-primary) 100%);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(32, 96, 223, 0.3);
+}
+
+.submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Loading state */
+.submit-button[aria-busy="true"] {
+    color: transparent;
+}
+
+.submit-button[aria-busy="true"]::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .submit-button {
+        font-size: 1rem;
+        padding: 0.875rem 1.5rem;
+    }
+}
+
+/* ====================================
+   Z-SCORE CARD - CLEAN OUTLINE STYLE
+   ==================================== */
+
+/* Z-Score card with blue outline instead of background */
+.result-card.z-score-card {
+  border: 2px solid var(--pico-primary);
+  background: var(--pico-card-background-color);
+  box-shadow: 0 2px 8px rgba(32, 96, 223, 0.15);
+}
+
+.result-card.z-score-card:hover {
+  border-color: var(--pico-primary-hover);
+  box-shadow: 0 4px 12px rgba(32, 96, 223, 0.25);
+}
+
+/* Make Z-Score value extra prominent */
+.result-card.z-score-card .result-value {
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  color: var(--pico-primary) !important;
+  line-height: 1.1;
+}
+
+/* Keep other result cards normal */
+.result-card:not(.z-score-card) .result-value {
+  color: var(--pico-color);
+}
+
+/* Responsive Z-Score sizing */
+@media (max-width: 768px) {
+  .result-card.z-score-card .result-value {
+    font-size: 1.8rem !important;
+  }
+}
+
+/* ====================================
+   NAVIGATION ENHANCEMENTS
+   ==================================== */
+
+
+/* Status indicator improvements */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.status-indicator {
+  font-size: 0.8rem;
+  transition: color var(--pico-transition);
+}
+
+/* Responsive navigation */
+@media (max-width: 768px) {
+  nav ul:first-child {
+    flex: 1;
+  }
+  
+  nav ul:last-child {
+    gap: 0.5rem;
+  }
+  
+  nav .secondary {
+    font-size: 0.8rem;
+    padding: 0.25rem;
+  }
+  
+  .status {
+    font-size: 0.75rem;
+  }
+}
+
+/* Focus states for accessibility */
+nav a:focus {
+  outline: 2px solid var(--pico-primary-focus);
+  outline-offset: 2px;
+  border-radius: calc(var(--pico-border-radius) * 0.5);
+}
