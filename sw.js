@@ -1,5 +1,5 @@
-const CACHE_NAME = "groningen-aov-v1.0.0"; // ← Update version!
-const DATA_CACHE_NAME = "groningen-aov-data-v1.0.0";
+const CACHE_NAME = "groningen-aov-v1.0.1"; // ← Update version!
+const DATA_CACHE_NAME = "groningen-aov-data-v1.0.1";
 
 // Files to cache for offline functionality - Production file structure
 const FILES_TO_CACHE = [
@@ -139,16 +139,41 @@ if (isDevelopment && (
             cache.put(request, responseToCache);
             return response;
           })
-          .catch(() => {
+.catch(() => {
             // If both cache and network fail
             if (request.destination === "document") {
+              console.log("[ServiceWorker] Offline navigation to:", url.pathname);
+              
               if (url.pathname.includes('results')) {
-                return cache.match("/results.html");
+                // Try both cached forms of the results page
+                return cache.match("/results/index.html")
+                  .then(response => response || cache.match("/results/"))
+                  .then(response => {
+                    if (response) {
+                      console.log("[ServiceWorker] Serving results page from cache");
+                      return response;
+                    }
+                    console.log("[ServiceWorker] Results page not found, serving index");
+                    return cache.match("/index.html");
+                  });
               }
+              
+              if (url.pathname.includes('about')) {
+                return cache.match("/about/index.html")
+                  .then(response => response || cache.match("/about/"))
+                  .then(response => response || cache.match("/index.html"));
+              }
+              
+              if (url.pathname.includes('test')) {
+                return cache.match("/test/index.html")
+                  .then(response => response || cache.match("/test/"))
+                  .then(response => response || cache.match("/index.html"));
+              }
+              
+              // Default fallback
               return cache.match("/index.html");
             }
-          });
-      });
+          });      });
     })
   );
 });
