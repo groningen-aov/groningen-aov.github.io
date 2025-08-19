@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/parameterz/groningen-aov-zscore.git"
+    "url": "git+https://github.com/groningen-aov/groningen-aov.github.io.git"
   },
   "keywords": [
     "pwa",
@@ -38,9 +38,9 @@
   "author": "Your Team",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/parameterz/groningen-aov-zscore/issues"
+    "url": "https://github.com/groningen-aov/groningen-aov.github.io/issues"
   },
-  "homepage": "https://parameterz.github.io/groningen-aov-zscore/",
+  "homepage": "https://github.com/groningen-aov/groningen-aov.github.io",
   "devDependencies": {
     "sharp": "^0.32.0"
   },
