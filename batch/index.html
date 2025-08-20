@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Batch Processing - Groningen AAD Calculator</title>
+  <link rel="stylesheet" href="../style/pico.blue.min.css">
+  <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Batch AAD Processing</h1>
+    <!-- Online requirement notice -->
+  <article>
+    <header>
+      📡 Online Connection Required
+    </header>
+    <p>
+      Batch processing requires an internet connection to load the CSV parsing library. 
+      For offline calculations, use the <a href="../">individual calculator</a>.
+    </p>
+  </article>
+    
+    <input type="file" id="csvFile" accept=".csv">
+    <div id="results"></div>
+    
+    <script src="../js/results-calculator.js"></script>
+    <script src="batch.js"></script>
+  </main>
+</body>
+</html>
