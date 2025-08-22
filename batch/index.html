@@ -1,30 +1,1312 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Batch Processing - Groningen AAD Calculator</title>
-  <link rel="stylesheet" href="../style/pico.blue.min.css">
-  <link rel="stylesheet" href="../style/style.css">
-</head>
-<body>
-  <main class="container">
-    <h1>Batch AAD Processing</h1>
-    <!-- Online requirement notice -->
-  <article>
-    <header>
-      📡 Online Connection Required
-    </header>
-    <p>
-      Batch processing requires an internet connection to load the CSV parsing library. 
-      For offline calculations, use the <a href="../">individual calculator</a>.
-    </p>
-  </article>
-    
-    <input type="file" id="csvFile" accept=".csv">
-    <div id="results"></div>
-    
-    <script src="../js/results-calculator.js"></script>
-    <script src="batch.js"></script>
-  </main>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Batch Processing - Groningen AAD Calculator</title>
+    <link rel="stylesheet" href="../style/pico.blue.min.css" />
+    <link rel="stylesheet" href="../style/style.css" />
+    <!-- PapaParse CDN for CSV processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <nav>
+        <ul>
+          <li><strong>Groningen AOV Calculator</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/" class="contrast">Home</a></li>
+          <li><a href="/about/" class="contrast">About</a></li>
+          <li><a href="/test/" class="contrast">Test</a></li>
+        </ul>
+      </nav>
+
+      <h1>Batch AAD Processing</h1>
+      
+      <!-- Online requirement notice -->
+      <article>
+        <header>🌐 Online Connection Required</header>
+        <p>
+          Batch processing requires an internet connection to load the CSV
+          parsing library. For offline calculations, use the
+          <a href="../">individual calculator</a>.
+        </p>
+      </article>  
+
+      <!-- Model Status -->
+      <div id="modelStatus" class="status-loading">
+        <span id="statusIndicator">⏳</span>
+        <span id="statusText">Loading calculation model...</span>
+      </div>
+
+      <div class="input-section">
+        <div class="section-title">
+          📊 Method 1: Paste Your Data
+        </div>
+        
+        <div class="format-hint">
+          Required: sex,age,height,weight &nbsp;•&nbsp; Optional: aad<br>
+          <small>✅ Supports comma, tab, or semicolon delimited data</small>
+        </div>
+
+        <textarea 
+          id="csvInput" 
+          class="text-input" 
+          placeholder="Paste your data here (CSV or tab-delimited from spreadsheets)...
+
+With Measured AAD (for Z-scores):
+sex,age,height,weight,aad
+male,40,170,70,22.5
+female,25,165,55,19.1
+
+Predictions Only (research mode):
+sex,age,height,weight
+male,40,170,70
+female,25,165,55
+
+Tab-delimited (from spreadsheets):
+sex	age	height	weight	aad
+male	40	170	70	22.5"
+          oninput="updateRowCounter()"
+        ></textarea>
+
+        <div class="row-counter" id="rowCounter">No data entered</div>
+
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="processData()" id="processBtn">
+            🚀 Process Data
+          </button>
+          <button class="btn btn-outline" onclick="loadExample('csv')">
+            📋 With Measured AAD
+          </button>
+          <button class="btn btn-outline" onclick="loadExample('prediction_only_csv')">
+            🔬 Predictions Only
+          </button>
+          <button class="btn btn-outline" onclick="loadExample('tab')">
+            📄 Tab (Spreadsheet)
+          </button>
+          <button class="btn btn-secondary" onclick="clearData()">
+            🗑️ Clear
+          </button>
+        </div>
+      </div>
+
+      <div class="divider">OR</div>
+
+      <div class="input-section">
+        <div class="section-title">
+          📁 Method 2: Upload CSV File
+        </div>
+
+        <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+          <div class="file-upload-icon">📄</div>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p style="color: #6c757d; font-size: 14px; margin-top: 8px;">
+            Supports .csv files up to 10MB
+          </p>
+          <input type="file" id="fileInput" accept=".csv,.txt" onchange="handleFileUpload(event)">
+        </div>
+      </div>
+
+      <!-- Processing Status with Pico Loading -->
+      <article id="processingStatus" aria-busy="false" style="display: none;">
+        <div class="processing-header">
+          <h3 id="processingTitle">🔄 Processing Batch...</h3>
+          <button onclick="cancelProcessing()" class="btn btn-secondary btn-small">Cancel</button>
+        </div>
+        
+        <div id="progressContainer" class="progress-container">
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div id="progressText" class="progress-text">Preparing...</div>
+        </div>
+        
+        <div id="processingDetails" class="processing-details">
+          <small>Estimated time remaining: <span id="timeRemaining">Calculating...</span></small>
+        </div>
+      </article>
+
+      <!-- Results Section -->
+      <div id="resultsSection" class="results-container" style="display: none;">
+        <h3>✅ Processing Complete</h3>
+        
+        <div id="resultsSummary" class="results-summary">
+          <!-- Summary stats will be populated here -->
+        </div>
+
+        <div class="results-actions">
+          <button onclick="downloadResults()" class="btn btn-primary">
+            💾 Download CSV Results
+          </button>
+          <button onclick="showCopyableTable()" class="btn btn-outline">
+            📋 Copy Results Table
+          </button>
+          <button onclick="showAllResults()" class="btn btn-outline">
+            👁️ View All Results
+          </button>
+          <button onclick="resetBatch()" class="btn btn-secondary">
+            🔄 Process New Batch
+          </button>
+        </div>
+
+        <!-- Copyable Results Table -->
+        <div id="copyableResults" class="results-preview" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4>Copy-Paste Ready Results</h4>
+            <button onclick="copyTableToClipboard()" class="btn btn-outline btn-small">📋 Copy to Clipboard</button>
+          </div>
+          <div id="copyableTable" class="table-container">
+            <!-- Copyable table will be populated here -->
+          </div>
+          <small id="copyableFormatHint" style="color: var(--pico-muted-color);">
+            Format information will appear here.
+          </small>
+        </div>
+
+        <!-- Full Results Table -->
+        <div id="allResults" class="results-preview" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 id="allResultsTitle">Complete Results</h4>
+            <button onclick="document.getElementById('allResults').style.display='none'" class="btn btn-outline btn-small">✖️ Close</button>
+          </div>
+          <div id="allResultsTable" class="table-container">
+            <!-- Full results table will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <div id="status" class="status"></div>
+    </main>
+
+    <script>
+      // =============================================================================
+      // GLOBAL STATE
+      // =============================================================================
+      let calculator = null;
+      let isModelLoaded = false;
+      let processingCancelled = false;
+      let currentResults = null;
+      let inputFormat = {
+        source: 'paste', // 'paste' or 'file'
+        delimiter: ',',   // ',', '\t', or ';'
+        hasAAD: true      // whether input included measured AAD column
+      };
+
+      // Real validated test cases from /test/ - much better than made-up data!
+      const exampleData = {
+        csv: `sex,age,height,weight,aad
+male,40,170,70,22.5
+female,0.003,50,3,6.2
+male,2,85,12,11.5
+female,10,140,35,15.1
+male,16,175,65,20.2
+female,25,165,55,19.1
+male,55,180,90,25.8
+female,30,155,50,18.9`,
+        
+        tab: `sex	age	height	weight	aad
+male	40	170	70	22.5
+female	0.003	50	3	6.2
+male	2	85	12	11.5
+female	10	140	35	15.1
+male	16	175	65	20.2
+female	25	165	55	19.1
+male	55	180	90	25.8
+female	30	155	50	18.9`,
+
+        // Version without measured AAD for researchers who just want predictions
+        prediction_only_csv: `sex,age,height,weight
+male,40,170,70
+female,0.003,50,3
+male,2,85,12
+female,10,140,35
+male,16,175,65
+female,25,165,55
+male,55,180,90
+female,30,155,50`,
+
+        prediction_only_tab: `sex	age	height	weight
+male	40	170	70
+female	0.003	50	3
+male	2	85	12
+female	10	140	35
+male	16	175	65
+female	25	165	55
+male	55	180	90
+female	30	155	50`
+      };
+
+      // =============================================================================
+      // BATCH CALCULATION ENGINE
+      // =============================================================================
+
+      /**
+       * Simple Results Calculator for batch processing
+       * Adapted from the existing results-calculator.js
+       */
+      class BatchCalculator {
+        constructor() {
+          this.lookupData = null;
+          this.isLoaded = false;
+        }
+
+        async loadModel() {
+          try {
+            console.log('Loading calculation model...');
+            const response = await fetch('/data/groningen_aad_lookup.json');
+            if (!response.ok) {
+              throw new Error(`Failed to load model: ${response.status}`);
+            }
+            this.lookupData = await response.json();
+            this.isLoaded = true;
+            console.log('Model loaded successfully');
+            return true;
+          } catch (error) {
+            console.error('Model loading failed:', error);
+            throw error;
+          }
+        }
+
+        findLowerIndex(vec, q) {
+          const n = vec.length;
+          if (q <= vec[0]) return 0;
+          if (q >= vec[n - 1]) return n - 2;
+          
+          let left = 0;
+          let right = n - 1;
+          
+          while (left < right - 1) {
+            const mid = Math.floor((left + right) / 2);
+            if (vec[mid] <= q) {
+              left = mid;
+            } else {
+              right = mid;
+            }
+          }
+          return left;
+        }
+
+        trilinearInterpolation(x, y, z, flatValues, xq, yq, zq, sq) {
+          const nX = x.length;
+          const nY = y.length;
+          const nZ = z.length;
+
+          const getValue = (i, j, k, s) => {
+            const index = i + j * nX + k * nX * nY + s * nX * nY * nZ;
+            return flatValues[index];
+          };
+
+          const i = this.findLowerIndex(x, xq);
+          const j = this.findLowerIndex(y, yq);
+          const k = this.findLowerIndex(z, zq);
+          const s = sq;
+
+          const i1 = Math.min(i + 1, nX - 1);
+          const j1 = Math.min(j + 1, nY - 1);
+          const k1 = Math.min(k + 1, nZ - 1);
+
+          const x0 = x[i], x1 = x[i1];
+          const y0 = y[j], y1 = y[j1];
+          const z0 = z[k], z1 = z[k1];
+
+          const xd = x1 - x0 !== 0 ? (xq - x0) / (x1 - x0) : 0;
+          const yd = y1 - y0 !== 0 ? (yq - y0) / (y1 - y0) : 0;
+          const zd = z1 - z0 !== 0 ? (zq - z0) / (z1 - z0) : 0;
+
+          const c000 = getValue(i, j, k, s);
+          const c100 = getValue(i1, j, k, s);
+          const c010 = getValue(i, j1, k, s);
+          const c110 = getValue(i1, j1, k, s);
+          const c001 = getValue(i, j, k1, s);
+          const c101 = getValue(i1, j, k1, s);
+          const c011 = getValue(i, j1, k1, s);
+          const c111 = getValue(i1, j1, k1, s);
+
+          const c00 = c000 * (1 - xd) + c100 * xd;
+          const c10 = c010 * (1 - xd) + c110 * xd;
+          const c01 = c001 * (1 - xd) + c101 * xd;
+          const c11 = c011 * (1 - xd) + c111 * xd;
+
+          const c0 = c00 * (1 - yd) + c10 * yd;
+          const c1 = c01 * (1 - yd) + c11 * yd;
+
+          return c0 * (1 - zd) + c1 * zd;
+        }
+
+        calculateSinglePatient(age, weight, height, sex, measuredAAD = null) {
+          if (!this.isLoaded) {
+            throw new Error('Model not loaded');
+          }
+
+          const logWeight = Math.log(weight);
+          const sqrtHeight = Math.sqrt(height);
+          const logAge = Math.log(age + 1);
+          const sexValue = sex.toLowerCase() === "male" ? 0 : 1;
+
+          const xGrid = this.lookupData.grid_axes.log_weight;
+          const yGrid = this.lookupData.grid_axes.sqrt_height;
+          const zGrid = this.lookupData.grid_axes.log_age_plus_1;
+
+          const meanAAD = this.trilinearInterpolation(
+            xGrid, yGrid, zGrid,
+            this.lookupData.predictions.mean_aad,
+            logWeight, sqrtHeight, logAge, sexValue
+          );
+
+          const stdDev = this.trilinearInterpolation(
+            xGrid, yGrid, zGrid,
+            this.lookupData.predictions.std_dev,
+            logWeight, sqrtHeight, logAge, sexValue
+          );
+
+          const result = {
+            meanAAD: meanAAD,
+            stdDev: stdDev,
+            lowerBound: meanAAD - 2 * stdDev,
+            upperBound: meanAAD + 2 * stdDev,
+            zScore: null
+          };
+
+          if (measuredAAD && measuredAAD > 0) {
+            result.zScore = (measuredAAD - meanAAD) / stdDev;
+          }
+
+          return result;
+        }
+      }
+
+      // =============================================================================
+      // INITIALIZATION
+      // =============================================================================
+      
+      async function initializeCalculator() {
+        try {
+          calculator = new BatchCalculator();
+          await calculator.loadModel();
+          isModelLoaded = true;
+          
+          document.getElementById('statusIndicator').textContent = '✅';
+          document.getElementById('statusText').textContent = 'Model ready for batch processing';
+          document.getElementById('modelStatus').className = 'status-success';
+          
+        } catch (error) {
+          console.error('Failed to initialize:', error);
+          document.getElementById('statusIndicator').textContent = '❌';
+          document.getElementById('statusText').textContent = 'Model load failed';
+          document.getElementById('modelStatus').className = 'status-error';
+          showStatus('Failed to load calculation model. Please refresh the page.', 'error');
+        }
+      }
+
+      // =============================================================================
+      // CSV PROCESSING FUNCTIONS
+      // =============================================================================
+
+      function detectDelimiter(text) {
+        const firstLine = text.split('\n')[0];
+        if (!firstLine) return ',';
+        
+        const commaCount = (firstLine.match(/,/g) || []).length;
+        const tabCount = (firstLine.match(/\t/g) || []).length;
+        const semicolonCount = (firstLine.match(/;/g) || []).length;
+        
+        if (tabCount > 0 && tabCount >= commaCount && tabCount >= semicolonCount) {
+          return '\t';
+        } else if (semicolonCount > commaCount) {
+          return ';';
+        } else {
+          return ',';
+        }
+      }
+
+      function validateAndCleanData(patients) {
+        const errors = [];
+        const cleanPatients = [];
+        
+        patients.forEach((patient, index) => {
+          const rowNum = index + 1;
+          const cleanPatient = {};
+          
+          // Clean and validate sex
+          if (!patient.sex) {
+            errors.push(`Row ${rowNum}: Missing sex value`);
+            return;
+          }
+          const sex = patient.sex.toString().toLowerCase().trim();
+          if (sex.startsWith('m')) {
+            cleanPatient.sex = 'male';
+          } else if (sex.startsWith('f')) {
+            cleanPatient.sex = 'female';
+          } else {
+            errors.push(`Row ${rowNum}: Invalid sex "${patient.sex}" (use M/F or Male/Female)`);
+            return;
+          }
+
+          // Clean and validate required numeric fields
+          const requiredFields = ['age', 'weight', 'height'];
+          for (const field of requiredFields) {
+            const value = parseFloat(patient[field]);
+            if (isNaN(value) || value <= 0) {
+              errors.push(`Row ${rowNum}: Invalid ${field} "${patient[field]}" (must be positive number)`);
+              return;
+            }
+            cleanPatient[field] = value;
+          }
+
+          // AAD is optional! Some researchers just want predictions
+          if (patient.aad !== undefined && patient.aad !== null && patient.aad !== '') {
+            const aadValue = parseFloat(patient.aad);
+            if (isNaN(aadValue) || aadValue <= 0) {
+              errors.push(`Row ${rowNum}: Invalid AAD "${patient.aad}" (must be positive number or leave blank)`);
+              return;
+            }
+            cleanPatient.aad = aadValue;
+          } else {
+            cleanPatient.aad = null; // No measured AAD - just want predictions
+          }
+
+          // Validate ranges (based on model constraints)
+          if (cleanPatient.age > 59) {
+            errors.push(`Row ${rowNum}: Age ${cleanPatient.age} exceeds maximum (59 years)`);
+            return;
+          }
+          if (cleanPatient.weight < 1.34 || cleanPatient.weight > 352) {
+            errors.push(`Row ${rowNum}: Weight ${cleanPatient.weight}kg outside valid range (1.34-352kg)`);
+            return;
+          }
+          if (cleanPatient.height < 30 || cleanPatient.height > 236) {
+            errors.push(`Row ${rowNum}: Height ${cleanPatient.height}cm outside valid range (30-236cm)`);
+            return;
+          }
+
+          cleanPatients.push(cleanPatient);
+        });
+
+        return { cleanPatients, errors };
+      }
+
+      async function processBatchOnMainThread(patients, progressCallback) {
+        const results = [];
+        // Dynamic chunk size: smaller chunks for tiny batches, larger for big ones
+        const chunkSize = patients.length < 100 ? Math.max(10, Math.ceil(patients.length / 5)) : 100;
+        const startTime = Date.now();
+
+        for (let i = 0; i < patients.length; i += chunkSize) {
+          if (processingCancelled) {
+            throw new Error('Processing cancelled by user');
+          }
+
+          const chunk = patients.slice(i, i + chunkSize);
+          
+          // Process chunk
+          for (const patient of chunk) {
+            try {
+              const calculation = calculator.calculateSinglePatient(
+                patient.age, patient.weight, patient.height, patient.sex, patient.aad
+              );
+              
+              results.push({
+                ...patient,
+                expectedAAD: calculation.meanAAD,
+                stdDev: calculation.stdDev,
+                lowerBound: calculation.lowerBound,
+                upperBound: calculation.upperBound,
+                zScore: calculation.zScore,
+                hasMeasuredAAD: calculation.hasMeasuredAAD,
+                status: 'success'
+              });
+            } catch (error) {
+              results.push({
+                ...patient,
+                error: error.message,
+                status: 'error'
+              });
+            }
+          }
+
+          // Update progress
+          const processed = Math.min(i + chunkSize, patients.length);
+          const progress = (processed / patients.length) * 100;
+          const elapsed = Date.now() - startTime;
+          const estimated = elapsed * (patients.length / processed) - elapsed;
+          
+          if (progressCallback) {
+            progressCallback({
+              processed,
+              total: patients.length,
+              progress,
+              timeRemaining: estimated
+            });
+          }
+
+          // Brief pause to keep UI responsive (and show progress for small batches)
+          if (i + chunkSize < patients.length) {
+            await new Promise(resolve => setTimeout(resolve, 1));
+          }
+        }
+
+        return results;
+      }
+
+      // =============================================================================
+      // UI HELPER FUNCTIONS
+      // =============================================================================
+
+      function updateRowCounter() {
+        const input = document.getElementById('csvInput').value.trim();
+        const counter = document.getElementById('rowCounter');
+        
+        if (!input) {
+          counter.textContent = 'No data entered';
+          return;
+        }
+
+        const lines = input.split('\n').filter(line => line.trim());
+        const delimiter = detectDelimiter(input);
+        const delimiterName = delimiter === '\t' ? 'tab' : delimiter === ';' ? 'semicolon' : 'comma';
+        
+        const hasHeader = lines[0] && lines[0].toLowerCase().includes('sex');
+        const dataRows = hasHeader ? lines.length - 1 : lines.length;
+        
+        // Check if AAD column is present
+        const hasAAD = hasHeader && lines[0].toLowerCase().includes('aad');
+        const mode = hasAAD ? 'with Z-scores' : 'predictions only';
+        
+        if (dataRows > 0) {
+          counter.textContent = `${dataRows} patient${dataRows !== 1 ? 's' : ''} ready (${delimiterName}-delimited, ${mode})`;
+        } else {
+          counter.textContent = 'Invalid data format';
+        }
+      }
+
+      function loadExample(format = 'csv') {
+        const data = exampleData[format] || exampleData.csv;
+        document.getElementById('csvInput').value = data;
+        updateRowCounter();
+        
+        const descriptions = {
+          'csv': 'validated test cases with measured AAD values',
+          'prediction_only_csv': 'research mode - predictions only (no measured AAD)',
+          'tab': 'tab-delimited format (like copying from spreadsheets)',
+          'prediction_only_tab': 'tab-delimited predictions only'
+        };
+        
+        const desc = descriptions[format] || 'example data';
+        showStatus(`Loaded ${desc}! Ready to process.`, 'info');
+      }
+
+      function clearData() {
+        document.getElementById('csvInput').value = '';
+        document.getElementById('fileInput').value = '';
+        updateRowCounter();
+        hideStatus();
+        resetProcessingUI();
+      }
+
+      function showStatus(message, type) {
+        const status = document.getElementById('status');
+        status.textContent = message;
+        status.className = `status ${type}`;
+        status.style.display = 'block';
+      }
+
+      function hideStatus() {
+        document.getElementById('status').style.display = 'none';
+      }
+
+      function resetProcessingUI() {
+        const processingElement = document.getElementById('processingStatus');
+        processingElement.style.display = 'none';
+        processingElement.setAttribute('aria-busy', 'false');
+        
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('processBtn').disabled = false;
+        document.getElementById('processBtn').textContent = '🚀 Process Data';
+        
+        // Reset progress container visibility
+        document.getElementById('progressContainer').style.display = 'block';
+        document.getElementById('processingDetails').style.display = 'block';
+        
+        processingCancelled = false;
+      }
+
+      // =============================================================================
+      // MAIN PROCESSING FUNCTIONS
+      // =============================================================================
+
+      async function processData() {
+        if (!isModelLoaded) {
+          showStatus('Model not ready. Please wait for initialization.', 'error');
+          return;
+        }
+
+        const textInput = document.getElementById('csvInput').value.trim();
+        const fileInput = document.getElementById('fileInput').files[0];
+
+        if (!textInput && !fileInput) {
+          showStatus('Please paste data or upload a file to process.', 'error');
+          return;
+        }
+
+        try {
+          resetProcessingUI();
+          let csvData = textInput;
+
+          // Handle file input if provided
+          if (fileInput && !textInput) {
+            if (fileInput.size > 10 * 1024 * 1024) {
+              showStatus('File too large. Maximum size is 10MB.', 'error');
+              return;
+            }
+
+            csvData = await readFileAsText(fileInput);
+            document.getElementById('csvInput').value = csvData;
+            updateRowCounter();
+          }
+
+          // Parse CSV data and detect format
+          const delimiter = detectDelimiter(csvData);
+          inputFormat.delimiter = delimiter;
+          inputFormat.source = fileInput && !textInput ? 'file' : 'paste';
+          
+          const parseResult = Papa.parse(csvData, {
+            header: true,
+            delimiter: delimiter,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            transformHeader: header => header.trim().toLowerCase()
+          });
+
+          if (parseResult.errors.length > 0) {
+            console.warn('CSV parsing warnings:', parseResult.errors);
+          }
+
+          const patients = parseResult.data;
+          if (patients.length === 0) {
+            showStatus('No valid data rows found in input.', 'error');
+            return;
+          }
+
+          // Check for required columns - AAD is now optional!
+          const requiredColumns = ['sex', 'age', 'height', 'weight'];
+          const availableColumns = Object.keys(patients[0] || {});
+          const missingColumns = requiredColumns.filter(col => !availableColumns.includes(col));
+
+          if (missingColumns.length > 0) {
+            showStatus(`Missing required columns: ${missingColumns.join(', ')}. Required: sex, age, height, weight. Optional: aad`, 'error');
+            return;
+          }
+
+          // Track whether input has AAD column
+          inputFormat.hasAAD = availableColumns.includes('aad');
+
+          // Validate and clean data
+          const { cleanPatients, errors } = validateAndCleanData(patients);
+          
+          if (errors.length > 0) {
+            const errorMsg = errors.slice(0, 5).join('\n') + (errors.length > 5 ? `\n... and ${errors.length - 5} more errors` : '');
+            showStatus(`Data validation errors:\n${errorMsg}`, 'error');
+            return;
+          }
+
+          if (cleanPatients.length === 0) {
+            showStatus('No valid patients found after validation.', 'error');
+            return;
+          }
+
+          // Start processing
+          await startBatchProcessing(cleanPatients);
+
+        } catch (error) {
+          console.error('Processing failed:', error);
+          showStatus(`Processing failed: ${error.message}`, 'error');
+          resetProcessingUI();
+        }
+      }
+
+      async function startBatchProcessing(patients) {
+        const isLargeBatch = patients.length > 500;
+        const startTime = Date.now();
+        
+        // Always show Pico loading spinner - it's beautiful and native!
+        // Small batches: Just elegant spinner (300ms minimum for visibility)
+        // Large batches: Spinner + detailed progress bar
+        const processingElement = document.getElementById('processingStatus');
+        const progressContainer = document.getElementById('progressContainer');
+        const processingTitle = document.getElementById('processingTitle');
+        
+        processingElement.style.display = 'block';
+        processingElement.setAttribute('aria-busy', 'true');
+        
+        if (isLargeBatch) {
+          // Large batch: Show full progress UI with spinner
+          processingTitle.textContent = '🔄 Processing Large Batch...';
+          progressContainer.style.display = 'block';
+          document.getElementById('processingDetails').style.display = 'block';
+        } else {
+          // Small batch: Just show elegant Pico spinner
+          processingTitle.textContent = `⚡ Processing ${patients.length} patients...`;
+          progressContainer.style.display = 'none';
+          document.getElementById('processingDetails').style.display = 'none';
+        }
+        
+        hideStatus();
+
+        const progressCallback = (progress) => {
+          if (isLargeBatch) {
+            const percentage = Math.round(progress.progress);
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = 
+              `${progress.processed} of ${progress.total} patients processed (${percentage}%)`;
+            
+            if (progress.timeRemaining > 0) {
+              const seconds = Math.ceil(progress.timeRemaining / 1000);
+              document.getElementById('timeRemaining').textContent = `${seconds} seconds`;
+            }
+          }
+        };
+
+        try {
+          const results = await processBatchOnMainThread(patients, progressCallback);
+          const processingTime = Date.now() - startTime;
+          
+          // For small batches, ensure the spinner is visible for at least 300ms
+          // (Just long enough to see the nice Pico animation!)
+          if (!isLargeBatch && processingTime < 300) {
+            await new Promise(resolve => setTimeout(resolve, 300 - processingTime));
+          }
+          
+          currentResults = results;
+          showResults(results, processingTime);
+          
+        } catch (error) {
+          showStatus(`Processing failed: ${error.message}`, 'error');
+          resetProcessingUI();
+        }
+      }
+
+      function showResults(results, processingTime) {
+        const processingElement = document.getElementById('processingStatus');
+        processingElement.style.display = 'none';
+        processingElement.setAttribute('aria-busy', 'false');
+        
+        document.getElementById('resultsSection').style.display = 'block';
+
+        const successful = results.filter(r => r.status === 'success').length;
+        const failed = results.filter(r => r.status === 'error').length;
+        const withAAD = results.filter(r => r.status === 'success' && r.hasMeasuredAAD).length;
+        const outliers = results.filter(r => r.zScore && Math.abs(r.zScore) > 2).length;
+        
+        // Performance celebration for fast processing!
+        const timeMessage = processingTime < 100 ? 
+          `⚡ Lightning fast: ${processingTime}ms` :
+          processingTime < 500 ?
+          `🚀 Blazing fast: ${processingTime}ms` :
+          `✅ Completed in ${(processingTime/1000).toFixed(1)}s`;
+
+        let summaryHtml = `<div class="performance-badge">${timeMessage}</div>`;
+        
+        if (inputFormat.hasAAD && withAAD > 0) {
+          // Show Z-score stats when we have measured AAD values
+          summaryHtml += `
+            <div class="summary-stats">
+              <div class="stat-card">
+                <div class="stat-number">${successful}</div>
+                <div class="stat-label">Successfully Processed</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${withAAD}</div>
+                <div class="stat-label">With Measured AAD</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${outliers}</div>
+                <div class="stat-label">Outliers (|Z| > 2)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${failed}</div>
+                <div class="stat-label">Failed</div>
+              </div>
+            </div>`;
+        } else {
+          // Show prediction-only stats
+          summaryHtml += `
+            <div class="summary-stats">
+              <div class="stat-card">
+                <div class="stat-number">${successful}</div>
+                <div class="stat-label">Predictions Generated</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">${failed}</div>
+                <div class="stat-label">Failed</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">📊</div>
+                <div class="stat-label">Research Mode</div>
+              </div>
+            </div>`;
+        }
+
+        document.getElementById('resultsSummary').innerHTML = summaryHtml;
+      }
+
+      function showCopyableTable() {
+        const copyableDiv = document.getElementById('copyableResults');
+        const copyableTable = document.getElementById('copyableTable');
+        
+        if (copyableDiv.style.display === 'none') {
+          const successful = currentResults.filter(r => r.status === 'success');
+          const delimiter = inputFormat.delimiter;
+          const delimiterName = delimiter === '\t' ? 'tab-delimited' : delimiter === ';' ? 'semicolon-delimited' : 'comma-delimited';
+          
+          // Create header row
+          let headers = ['sex', 'age', 'height', 'weight'];
+          if (inputFormat.hasAAD) headers.push('measured_aad');
+          headers.push('expected_aad', 'std_dev');
+          if (inputFormat.hasAAD) headers.push('z_score');
+          headers.push('lower_bound', 'upper_bound');
+          
+          // Create data rows
+          const rows = [headers.join(delimiter)];
+          
+          successful.forEach(result => {
+            let row = [
+              result.sex,
+              result.age,
+              result.height,
+              result.weight
+            ];
+            
+            if (inputFormat.hasAAD) {
+              row.push(result.aad ? result.aad.toFixed(1) : '');
+            }
+            
+            row.push(
+              result.expectedAAD.toFixed(3),
+              result.stdDev.toFixed(3)
+            );
+            
+            if (inputFormat.hasAAD) {
+              row.push(result.zScore ? result.zScore.toFixed(3) : '');
+            }
+            
+            row.push(
+              result.lowerBound.toFixed(3),
+              result.upperBound.toFixed(3)
+            );
+            
+            rows.push(row.join(delimiter));
+          });
+          
+          const tableText = rows.join('\n');
+          
+          copyableTable.innerHTML = `
+            <textarea readonly style="width: 100%; min-height: 300px; font-family: monospace; font-size: 0.9rem; white-space: pre; overflow: auto;">${tableText}</textarea>
+          `;
+          
+          // Update the description
+          document.getElementById('copyableFormatHint').textContent = 
+            `This table is ${delimiterName} and can be copied directly back to spreadsheets. Select all text and copy (Ctrl+A, Ctrl+C).`;
+          
+          copyableDiv.style.display = 'block';
+        } else {
+          copyableDiv.style.display = 'none';
+        }
+      }
+
+      function showAllResults() {
+        const allDiv = document.getElementById('allResults');
+        const allTable = document.getElementById('allResultsTable');
+        const allTitle = document.getElementById('allResultsTitle');
+        
+        if (allDiv.style.display === 'none') {
+          const successful = currentResults.filter(r => r.status === 'success');
+          
+          // Update the title with actual count
+          allTitle.textContent = `Complete Results (All ${currentResults.length} patients)`;
+          
+          let html = '<div style="max-height: 500px; overflow: auto;"><table class="striped"><thead><tr>';
+          html += '<th>Sex</th><th>Age</th><th>Height</th><th>Weight</th>';
+          if (inputFormat.hasAAD) html += '<th>Measured AAD</th>';
+          html += '<th>Expected AAD</th><th>Std Dev</th>';
+          if (inputFormat.hasAAD) html += '<th>Z-Score</th>';
+          html += '<th>Normal Range</th></tr></thead><tbody>';
+          
+          successful.forEach(result => {
+            html += '<tr>';
+            html += `<td>${result.sex}</td>`;
+            html += `<td>${result.age}</td>`;
+            html += `<td>${result.height}</td>`;
+            html += `<td>${result.weight}</td>`;
+            
+            if (inputFormat.hasAAD) {
+              html += `<td>${result.aad ? result.aad.toFixed(1) : '—'}</td>`;
+            }
+            
+            html += `<td><strong>${result.expectedAAD.toFixed(2)}</strong></td>`;
+            html += `<td>${result.stdDev.toFixed(2)}</td>`;
+            
+            if (inputFormat.hasAAD) {
+              const zScoreStyle = result.zScore && Math.abs(result.zScore) > 2 ? 
+                'style="color: var(--pico-del-color); font-weight: bold;"' : '';
+              html += `<td ${zScoreStyle}>${result.zScore ? result.zScore.toFixed(2) : '—'}</td>`;
+            }
+            
+            html += `<td>${result.lowerBound.toFixed(1)} - ${result.upperBound.toFixed(1)}</td>`;
+            html += '</tr>';
+          });
+          
+          html += '</tbody></table></div>';
+          allTable.innerHTML = html;
+          allDiv.style.display = 'block';
+        } else {
+          allDiv.style.display = 'none';
+        }
+      }
+
+      async function copyTableToClipboard() {
+        try {
+          const textarea = document.querySelector('#copyableTable textarea');
+          await navigator.clipboard.writeText(textarea.value);
+          showStatus('✅ Table copied to clipboard! You can paste it directly into spreadsheets.', 'success');
+        } catch (error) {
+          // Fallback for older browsers
+          const textarea = document.querySelector('#copyableTable textarea');
+          textarea.select();
+          document.execCommand('copy');
+          showStatus('📋 Table selected. Press Ctrl+C (Cmd+C on Mac) to copy.', 'info');
+        }
+      }
+
+      function downloadResults() {
+        if (!currentResults) return;
+
+        // Create headers based on input format
+        let csvHeaders = ['sex', 'age', 'height', 'weight'];
+        if (inputFormat.hasAAD) csvHeaders.push('measured_aad');
+        csvHeaders.push('expected_aad', 'std_dev');
+        if (inputFormat.hasAAD) csvHeaders.push('z_score');
+        csvHeaders.push('lower_bound', 'upper_bound', 'status');
+        
+        const csvData = currentResults.map(result => {
+          if (result.status === 'error') {
+            let row = [result.sex || '', result.age || '', result.height || '', result.weight || ''];
+            if (inputFormat.hasAAD) row.push(result.aad || '');
+            row.push('', '', '');
+            if (inputFormat.hasAAD) row.push('');
+            row.push('', '', 'error: ' + result.error);
+            return row;
+          }
+          
+          let row = [
+            result.sex,
+            result.age,
+            result.height,
+            result.weight
+          ];
+          
+          if (inputFormat.hasAAD) {
+            row.push(result.aad ? result.aad.toFixed(1) : '');
+          }
+          
+          row.push(
+            result.expectedAAD.toFixed(3),
+            result.stdDev.toFixed(3)
+          );
+          
+          if (inputFormat.hasAAD) {
+            row.push(result.zScore ? result.zScore.toFixed(3) : '');
+          }
+          
+          row.push(
+            result.lowerBound.toFixed(3),
+            result.upperBound.toFixed(3),
+            result.status
+          );
+          
+          return row;
+        });
+
+        const csvContent = [csvHeaders, ...csvData].map(row => row.join(',')).join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const mode = inputFormat.hasAAD ? 'with_zscore' : 'predictions_only';
+        a.download = `groningen_aad_batch_${mode}_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function resetBatch() {
+        currentResults = null;
+        inputFormat = {
+          source: 'paste',
+          delimiter: ',',
+          hasAAD: true
+        };
+        resetProcessingUI();
+        clearData();
+      }
+
+      function cancelProcessing() {
+        processingCancelled = true;
+        showStatus('Processing cancelled by user.', 'info');
+        resetProcessingUI();
+      }
+
+      // =============================================================================
+      // FILE HANDLING
+      // =============================================================================
+
+      function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = e => resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsText(file);
+        });
+      }
+
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          showStatus(`📁 File selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'info');
+        }
+      }
+
+      // =============================================================================
+      // DRAG AND DROP
+      // =============================================================================
+
+      const fileUpload = document.querySelector('.file-upload');
+      
+      fileUpload.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUpload.style.borderColor = '#667eea';
+        fileUpload.style.background = '#f8f9ff';
+      });
+
+      fileUpload.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        fileUpload.style.borderColor = '#e9ecef';
+        fileUpload.style.background = 'transparent';
+      });
+
+      fileUpload.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUpload.style.borderColor = '#e9ecef';
+        fileUpload.style.background = 'transparent';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          document.getElementById('fileInput').files = files;
+          handleFileUpload({ target: { files: files } });
+        }
+      });
+
+      // =============================================================================
+      // INITIALIZATION
+      // =============================================================================
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeCalculator();
+      });
+    </script>
+
+    <style>
+      /* Additional styles for batch processing */
+      .status-loading {
+        padding: 1rem;
+        background: var(--pico-card-background-color);
+        border-radius: var(--pico-border-radius);
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .status-success {
+        background: var(--pico-ins-background-color);
+        color: var(--pico-ins-color);
+      }
+
+      .status-error {
+        background: var(--pico-del-background-color);
+        color: var(--pico-del-color);
+      }
+
+
+
+      .processing-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .processing-header h3 {
+        margin: 0;
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
+      .progress-container {
+        margin-bottom: 1rem;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background: var(--pico-muted-border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--pico-primary);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .progress-text {
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .processing-details {
+        text-align: center;
+        color: var(--pico-muted-color);
+      }
+
+      .results-container {
+        background: var(--pico-card-background-color);
+        padding: 1.5rem;
+        border-radius: var(--pico-border-radius);
+        margin: 1rem 0;
+      }
+
+      .results-summary {
+        margin-bottom: 1.5rem;
+      }
+
+      .performance-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--pico-primary), var(--pico-primary-hover-background));
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .summary-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .stat-card {
+        text-align: center;
+        padding: 1rem;
+        background: var(--pico-card-sectioning-background-color);
+        border-radius: var(--pico-border-radius);
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--pico-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: var(--pico-muted-color);
+      }
+
+      .results-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+
+      .results-preview {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--pico-muted-border-color);
+      }
+
+      .table-container {
+        overflow-x: auto;
+        margin-top: 1rem;
+      }
+
+      .file-upload {
+        cursor: pointer;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+        color: var(--pico-muted-color);
+      }
+
+      .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--pico-muted-border-color);
+        z-index: 1;
+      }
+
+      .divider {
+        background: var(--pico-background-color);
+        padding: 0 1rem;
+        z-index: 2;
+        position: relative;
+      }
+
+      @media (max-width: 768px) {
+        .results-actions {
+          flex-direction: column;
+        }
+        
+        .button-group {
+          flex-direction: column;
+        }
+        
+        .summary-stats {
+          grid-template-columns: 1fr;
+        }
+        
+        .processing-header {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+      }
+    </style>
+  </body>
 </html>

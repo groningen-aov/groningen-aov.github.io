@@ -12,7 +12,7 @@
 
 ---
 
-## **Phase 1: Core Batch Infrastructure **
+## **Phase 1: Core Batch Infrastructure (Week 1)**
 *Objective: Build fundamental batch processing capability*
 
 ### **Technical Tasks**
@@ -30,7 +30,7 @@
 
 - [ ] **Batch Calculation Core**
   - Create `processBatch(patients)` function
-  - Chunk processing (1000 patients per chunk)
+  - Chunk processing (100 patients per chunk for UI responsiveness)
   - Progress tracking and UI updates
   - Memory management for large files
 
@@ -40,7 +40,19 @@
 async function processBatchFile(file) { }
 function parseCSVData(csvText) { }
 function validateBatchData(patients) { }
-function calculateBatchPredictions(patients) { }
+
+// Main processing logic - optimized for <1000 patients (95% of use cases)
+function processBatch(patients) {
+  // Only use Web Worker for truly large batches
+  if (patients.length > 2000) {
+    return processWithWebWorker(patients);
+  } else {
+    return processOnMainThread(patients);
+  }
+}
+
+function processOnMainThread(patients) { }
+function processWithWebWorker(patients) { } // Phase 4 enhancement
 function generateOutputCSV(results) { }
 ```
 
@@ -51,14 +63,15 @@ function generateOutputCSV(results) { }
 - [ ] Memory usage testing on mobile devices
 
 ### **Success Criteria**
-- Processes 1000-patient file in <10 seconds
+- Processes 1000-patient file in <500ms (main thread)
 - Accurate results matching individual calculations
 - Handles malformed CSV gracefully
-- Works on mobile browsers
+- Works reliably on mobile browsers
+- Web Worker enhancement ready for large batches (>2000 patients)
 
 ---
 
-## **Phase 2: User Experience & Validation **
+## **Phase 2: User Experience & Validation (Week 2)**
 *Objective: Create production-ready user interface*
 
 ### **UI/UX Development**
@@ -112,8 +125,40 @@ function generateOutputCSV(results) { }
 
 ---
 
-## **Phase 3: Robust Testing & Edge Cases **
-*Objective: Ensure reliability with real-world data*
+## **Phase 3: Main Thread Optimization & Testing (Week 3)**
+*Objective: Optimize for <1000 patients (95% of clinical use cases)*
+
+### **Main Thread Processing Optimization**
+- [ ] **Chunked Processing for Responsiveness**
+  ```javascript
+  async function processOnMainThread(patients) {
+    const chunkSize = 100; // Process in small chunks
+    const results = [];
+    
+    for (let i = 0; i < patients.length; i += chunkSize) {
+      const chunk = patients.slice(i, i + chunkSize);
+      
+      // Process chunk
+      chunk.forEach(patient => {
+        results.push(calculateAAD(patient));
+      });
+      
+      // Brief pause to keep UI responsive
+      if (i + chunkSize < patients.length) {
+        await new Promise(resolve => setTimeout(resolve, 1));
+        updateProgress(i + chunkSize, patients.length);
+      }
+    }
+    
+    return results;
+  }
+  ```
+
+- [ ] **Performance Optimization**
+  - Profile calculation bottlenecks
+  - Optimize lookup table access patterns
+  - Minimize object creation during loops
+  - Implement efficient progress reporting
 
 ### **Comprehensive Testing Suite**
 - [ ] **Dataset Variations**
@@ -128,17 +173,17 @@ function generateOutputCSV(results) { }
   - Files with extra columns (should ignore gracefully)
   - Files with missing optional data
 
-- [ ] **Performance Testing**
-  - 100 patients: < 1 second
-  - 1,000 patients: < 5 seconds  
-  - 10,000 patients: < 30 seconds
-  - 50,000 patients: < 2 minutes (desktop only)
+- [ ] **Performance Testing (Main Thread Focus)**
+  - 100 patients: < 50ms
+  - 500 patients: < 200ms
+  - 1,000 patients: < 500ms  
+  - 2,000 patients: < 1 second (triggers Web Worker in Phase 4)
 
 - [ ] **Error Recovery Testing**
   - Partially invalid data (some rows good, some bad)
-  - Network interruption during processing
-  - Browser memory limits
+  - Browser memory limits on mobile
   - Device rotation during processing (mobile)
+  - Cancellation without memory leaks
 
 ### **Real-World Data Testing**
 - [ ] **Clinical Partner Testing**
@@ -153,29 +198,35 @@ function generateOutputCSV(results) { }
   - Older browser versions (2-3 years back)
   - Different device types and screen sizes
 
-### **Performance Optimization**
-- [ ] **Memory Management**
-  - Implement streaming processing for very large files
-  - Clear intermediate data structures
-  - Monitor memory usage during processing
-  - Graceful degradation on memory constraints
-
-- [ ] **Processing Optimization**
-  - Profile calculation bottlenecks
-  - Optimize lookup table access patterns
-  - Consider Web Workers for background processing
-  - Implement cancellation without memory leaks
-
 ### **Success Criteria**
 - 99%+ accuracy vs individual calculations
 - Handles 95% of real-world data formats
-- Processes 10K patients reliably on mobile
+- Processes 1K patients reliably on mobile
 - Zero crashes or data loss
 
 ---
 
-## **Phase 4: Production Polish & Advanced Features **
-*Objective: Production-ready with advanced capabilities*
+## **Phase 4: Production Polish & Advanced Features (Week 4)**
+*Objective: Production-ready with optional enhancements*
+
+### **Web Worker Enhancement (Optional)**
+- [ ] **Large Batch Processing (>2000 patients)**
+  - Implement Web Worker for background processing
+  - Non-blocking UI during large batch operations
+  - Progress reporting from background thread
+  - Graceful fallback to main thread if Web Worker fails
+
+- [ ] **Web Worker Implementation**
+  ```javascript
+  // Worker decision logic (already integrated above)
+  function processBatch(patients) {
+    if (patients.length > 2000) {
+      return processWithWebWorker(patients);
+    } else {
+      return processOnMainThread(patients);
+    }
+  }
+  ```
 
 ### **Advanced Features**
 - [ ] **Enhanced Output Options**
@@ -245,12 +296,13 @@ const validationCases = [
 ```
 
 ### **Performance Benchmarks**
-| Patient Count | Target Time | Memory Limit | 
-|---------------|-------------|--------------|
-| 100           | <1 sec      | <10MB       |
-| 1,000         | <5 sec      | <50MB       |
-| 10,000        | <30 sec     | <200MB      |
-| 50,000        | <2 min      | <500MB      |
+| Patient Count | Target Time | Processing Method | Memory Limit | 
+|---------------|-------------|-------------------|--------------|
+| 100           | <50ms       | Main Thread      | <10MB       |
+| 500           | <200ms      | Main Thread      | <25MB       |
+| 1,000         | <500ms      | Main Thread      | <50MB       |
+| 2,000         | <1 sec      | Main Thread      | <100MB      |
+| 5,000+        | <10 sec     | Web Worker       | <200MB      |
 
 ### **Quality Gates**
 - [ ] **Phase 1**: Basic functionality working
@@ -263,7 +315,7 @@ const validationCases = [
 ## **Risk Mitigation**
 
 ### **Technical Risks**
-- **Large file memory issues**: Implement streaming processing
+- **Large file memory issues**: Implement chunked processing on main thread
 - **Browser compatibility**: Comprehensive cross-browser testing
 - **Calculation accuracy**: Extensive validation against R model
 - **Performance degradation**: Regular performance profiling
@@ -291,8 +343,8 @@ const validationCases = [
 - [ ] Cross-browser compatibility achieved
 
 ### **User Experience Success**
-- [ ] <2 minutes from upload to results for 1000 patients
-- [ ] <5% user error rate on properly formatted files
+- [ ] <500ms processing time for 1000 patients (main thread)
+- [ ] Zero data loss incidents during processing
 - [ ] Positive feedback from clinical testing partners
 - [ ] Self-service success (no support needed for basic use)
 
@@ -304,4 +356,23 @@ const validationCases = [
 
 ---
 
+## **Timeline Summary**
 
+**Week 1**: Core batch processing engine (main thread optimized)  
+**Week 2**: User-friendly interface and validation  
+**Week 3**: Main thread optimization and reliability testing  
+**Week 4**: Production polish and optional Web Worker enhancement  
+
+**Total Timeline**: 4 weeks to production-ready batch processing
+
+---
+
+## **Next Steps**
+
+1. **Immediate**: Begin Phase 1 development with main thread focus
+2. **Week 1**: Complete core functionality and basic testing
+3. **Week 2**: User interface and experience refinement
+4. **Week 3**: Main thread optimization with clinical partners
+5. **Week 4**: Final polish and optional Web Worker implementation
+
+*This roadmap ensures a systematic progression from basic functionality to production-ready batch processing while maintaining the high accuracy and reliability standards expected in clinical applications. The focus on main thread processing for <1000 patients aligns perfectly with typical clinical workflows, with Web Worker enhancement available for edge cases.*

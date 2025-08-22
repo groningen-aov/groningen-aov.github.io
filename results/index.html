@@ -32,23 +32,19 @@
     <link rel="manifest" href="../manifest.json" />
   </head>
   <body>
-    <!-- Navigation -->
-    <nav class="container-fluid">
-      <ul>
-        <li><a href="/" class="secondary">Home</a></li>
-        <li><a href="/about/" class="secondary">About</a></li>
-        <li><a href="/test/" class="secondary">Test</a></li>
-        <li>
-          <div class="status">
-            <span class="status-indicator" style="color: var(--pico-primary);">●</span>
-            <span>Ready</span>
-          </div>
-        </li>
-      </ul>
-    </nav>
-
     <!-- Main container using Pico.css container -->
     <main class="container">
+      <!-- Navigation -->
+      <nav>
+        <ul>
+          <li><strong>Groningen AOV Calculator</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/" class="contrast">Home</a></li>
+          <li><a href="/about/" class="contrast">About</a></li>
+          <li><a href="/test/" class="contrast">Test</a></li>
+        </ul>
+      </nav>
       <!-- Header -->
       <header class="calculator-header">
         <hgroup>
@@ -61,17 +57,27 @@
       <section class="results" id="resultsSection">
         <article>
           <!-- Loading state -->
-          <div id="loadingState" style="text-align: center; padding: 2rem;">
-            <div style="margin-bottom: 1rem;">Loading calculation model...</div>
+          <div id="loadingState" style="text-align: center; padding: 2rem">
+            <div style="margin-bottom: 1rem">Loading calculation model...</div>
             <progress></progress>
           </div>
 
           <!-- Results Grid -->
-          <div class="result-grid" id="resultGrid" style="display: none;">
+          <div class="result-grid" id="resultGrid" style="display: none">
             <!-- Z-Score Result - Clean outline style -->
             <div class="result-card z-score-card">
               <strong>Z-Score</strong>
-              <div class="result-value" id="zScoreValue" style="font-size: 2.2rem; font-weight: 700; color: var(--pico-primary);">--</div>
+              <div
+                class="result-value"
+                id="zScoreValue"
+                style="
+                  font-size: 2.2rem;
+                  font-weight: 700;
+                  color: var(--pico-primary);
+                "
+              >
+                --
+              </div>
             </div>
 
             <!-- Expected AAD -->
@@ -97,8 +103,12 @@
           </div> -->
 
           <!-- Documentation Actions -->
-          <div class="documentation-actions" id="documentationActions" style="margin-top: 1.5rem; display: none;">
-            <div style="text-align: center;">
+          <div
+            class="documentation-actions"
+            id="documentationActions"
+            style="margin-top: 1.5rem; display: none"
+          >
+            <div style="text-align: center">
               <button type="button" class="outline" id="copyResultsBtn">
                 📋 Copy Results
               </button>
@@ -116,7 +126,12 @@
           </header>
 
           <!-- Units Toggle - INSIDE the form -->
-          <form class="calculator-form" id="adjustmentForm" action="/results/" method="GET">
+          <form
+            class="calculator-form"
+            id="adjustmentForm"
+            action="/results/"
+            method="GET"
+          >
             <div class="grid">
               <!-- Sex Selection -->
               <div>
@@ -158,7 +173,7 @@
               <span class="conversion" id="age-conversion"></span>
             </div>
             <div class="form-section">
-            <!-- Units Toggle -->
+              <!-- Units Toggle -->
               <fieldset>
                 <legend>Units:</legend>
                 <input
@@ -263,7 +278,10 @@
     <footer class="container">
       <small>
         <p>
-          <em>For clinical decision support only. Always verify with institutional protocols.</em>
+          <em
+            >For clinical decision support only. Always verify with
+            institutional protocols.</em
+          >
         </p>
       </small>
     </footer>
@@ -274,7 +292,7 @@
     <!-- Lightweight Results Calculator (standalone) -->
     <script src="../js/results-calculator.js"></script>
     <script src="../js/version.js"></script>
-    
+
     <!-- Enhanced Form Utils (handles form behavior consistently) -->
     <script type="module" src="../js/enhanced-form-utils.js"></script>
 
@@ -289,8 +307,9 @@
               console.log("✅ SW registered: ", registration);
 
               // Update status indicator
-              const statusText = document.querySelector('#statusText');
-              const statusIndicator = document.querySelector('#statusIndicator');
+              const statusText = document.querySelector("#statusText");
+              const statusIndicator =
+                document.querySelector("#statusIndicator");
 
               if (statusText && statusIndicator) {
                 statusText.textContent = "Ready (offline available)";
@@ -321,8 +340,9 @@
               console.log("❌ SW registration failed: ", registrationError);
 
               // Update status indicator
-              const statusText = document.querySelector('#statusText');
-              const statusIndicator = document.querySelector('#statusIndicator');
+              const statusText = document.querySelector("#statusText");
+              const statusIndicator =
+                document.querySelector("#statusIndicator");
 
               if (statusText && statusIndicator) {
                 statusText.textContent = "Online only";
@@ -334,8 +354,8 @@
         console.log("❌ Service workers not supported");
 
         // Update status for unsupported browsers
-        const statusText = document.querySelector('#statusText');
-        const statusIndicator = document.querySelector('#statusIndicator');
+        const statusText = document.querySelector("#statusText");
+        const statusIndicator = document.querySelector("#statusIndicator");
 
         if (statusText && statusIndicator) {
           statusText.textContent = "Online only";
@@ -363,125 +383,152 @@
           try {
             // Load the model
             await this.calculator.loadModel();
-            
+
             // Update status indicator
-            const statusText = document.querySelector('#statusText');
-            const statusIndicator = document.querySelector('#statusIndicator');
+            const statusText = document.querySelector("#statusText");
+            const statusIndicator = document.querySelector("#statusIndicator");
             if (statusText && statusIndicator) {
               statusText.textContent = "Model ready";
               statusIndicator.style.color = "var(--pico-primary)";
             }
-            
+
             // Calculate and display results
             this.calculateAndDisplayResults();
-            
           } catch (error) {
-            console.error('Failed to load model or calculate:', error);
-            
+            console.error("Failed to load model or calculate:", error);
+
             // Update status indicator for error
-            const statusText = document.querySelector('#statusText');
-            const statusIndicator = document.querySelector('#statusIndicator');
+            const statusText = document.querySelector("#statusText");
+            const statusIndicator = document.querySelector("#statusIndicator");
             if (statusText && statusIndicator) {
               statusText.textContent = "Model load failed";
               statusIndicator.style.color = "#dc3545"; // Red
             }
-            
-            this.showError('Failed to load calculation model: ' + error.message);
+
+            this.showError(
+              "Failed to load calculation model: " + error.message
+            );
           }
         }
 
         calculateAndDisplayResults() {
           try {
             // Get canonical values using the form controller
-            const values = window.formController ? 
-              window.formController.getCanonicalValues() : 
-              this.getCanonicalValuesFromURL();
-            
-            if (!values.sex || values.age <= 0 || values.height <= 0 || values.weight <= 0) {
-              throw new Error('Invalid input parameters');
+            const values = window.formController
+              ? window.formController.getCanonicalValues()
+              : this.getCanonicalValuesFromURL();
+
+            if (
+              !values.sex ||
+              values.age <= 0 ||
+              values.height <= 0 ||
+              values.weight <= 0
+            ) {
+              throw new Error("Invalid input parameters");
             }
 
             // Calculate using the lightweight calculator
             const result = this.calculator.calculateResults(
-              values.age, 
-              values.weight, 
-              values.height, 
-              values.sex, 
+              values.age,
+              values.weight,
+              values.height,
+              values.sex,
               values.measuredAAD
             );
-            
+
             this.displayResults(result);
-            
           } catch (error) {
-            console.error('Calculation error:', error);
-            this.showError('Failed to calculate results: ' + error.message);
+            console.error("Calculation error:", error);
+            this.showError("Failed to calculate results: " + error.message);
           }
         }
 
         // Fallback method if form controller isn't ready yet
         getCanonicalValuesFromURL() {
-          const age = parseFloat(this.urlParams.get('age')) || 0;
-          const ageUnit = this.urlParams.get('ageUnit') || 'years';
-          const height = parseFloat(this.urlParams.get('height')) || 0;
-          const weight = parseFloat(this.urlParams.get('weight')) || 0;
-          const units = this.urlParams.get('units') || 'metric';
-          const sex = this.urlParams.get('sex');
-          const measuredAAD = parseFloat(this.urlParams.get('measuredAAD')) || null;
+          const age = parseFloat(this.urlParams.get("age")) || 0;
+          const ageUnit = this.urlParams.get("ageUnit") || "years";
+          const height = parseFloat(this.urlParams.get("height")) || 0;
+          const weight = parseFloat(this.urlParams.get("weight")) || 0;
+          const units = this.urlParams.get("units") || "metric";
+          const sex = this.urlParams.get("sex");
+          const measuredAAD =
+            parseFloat(this.urlParams.get("measuredAAD")) || null;
 
           // Simple conversions (duplicating from Conversions for fallback)
-          const ageInYears = ageUnit === 'years' ? age : 
-                            ageUnit === 'months' ? age/12 :
-                            ageUnit === 'weeks' ? age/52.18 :
-                            age/365.25;
+          const ageInYears =
+            ageUnit === "years"
+              ? age
+              : ageUnit === "months"
+              ? age / 12
+              : ageUnit === "weeks"
+              ? age / 52.18
+              : age / 365.25;
 
           return {
             age: ageInYears,
-            height: units === 'metric' ? height : height * 2.54,
-            weight: units === 'metric' ? weight : weight / 2.20462,
+            height: units === "metric" ? height : height * 2.54,
+            weight: units === "metric" ? weight : weight / 2.20462,
             sex: sex,
-            measuredAAD: measuredAAD
+            measuredAAD: measuredAAD,
           };
         }
 
         displayResults(result) {
           // Hide loading state and show results
-          document.getElementById('loadingState').style.display = 'none';
-          document.getElementById('resultGrid').style.display = 'grid';
-          document.getElementById('documentationActions').style.display = 'block';
+          document.getElementById("loadingState").style.display = "none";
+          document.getElementById("resultGrid").style.display = "grid";
+          document.getElementById("documentationActions").style.display =
+            "block";
 
           // Update result cards
           if (result.zScore !== null) {
-            document.getElementById('zScoreValue').textContent = result.zScore.toFixed(2);
+            document.getElementById("zScoreValue").textContent =
+              result.zScore.toFixed(2);
           } else {
-            document.getElementById('zScoreValue').textContent = '--';
+            document.getElementById("zScoreValue").textContent = "--";
           }
-          
-          document.getElementById('meanAAD').textContent = result.meanAAD.toFixed(1);
-          document.getElementById('stdDev').textContent = result.stdDev.toFixed(2);
-          document.getElementById('normalRange').textContent = `${result.lowerBound.toFixed(1)} - ${result.upperBound.toFixed(1)}`;
+
+          document.getElementById("meanAAD").textContent =
+            result.meanAAD.toFixed(1);
+          document.getElementById("stdDev").textContent =
+            result.stdDev.toFixed(2);
+          document.getElementById(
+            "normalRange"
+          ).textContent = `${result.lowerBound.toFixed(
+            1
+          )} - ${result.upperBound.toFixed(1)}`;
 
           // No clinical interpretation - users are sophisticated enough to interpret Z-scores themselves
         }
 
         setupDocumentationActions() {
-          document.getElementById('copyResultsBtn')?.addEventListener('click', () => {
-            this.copyResultsToClipboard();
-          });
+          document
+            .getElementById("copyResultsBtn")
+            ?.addEventListener("click", () => {
+              this.copyResultsToClipboard();
+            });
         }
 
         copyResultsToClipboard() {
           // Get display values from URL (what user actually entered)
-          const sex = this.urlParams.get('sex') || 'Not specified';
-          const ageDisplay = `${this.urlParams.get('age')} ${this.urlParams.get('ageUnit') || 'years'}`;
-          const units = this.urlParams.get('units') || 'metric';
-          const heightDisplay = `${this.urlParams.get('height')} ${units === 'metric' ? 'cm' : 'in'}`;
-          const weightDisplay = `${this.urlParams.get('weight')} ${units === 'metric' ? 'kg' : 'lbs'}`;
-          const measuredAAD = this.urlParams.get('measuredAAD');
-          
-          const zScore = document.getElementById('zScoreValue').textContent;
-          const meanAAD = document.getElementById('meanAAD').textContent;
-          const stdDev = document.getElementById('stdDev').textContent;
-          const normalRange = document.getElementById('normalRange').textContent;
+          const sex = this.urlParams.get("sex") || "Not specified";
+          const ageDisplay = `${this.urlParams.get("age")} ${
+            this.urlParams.get("ageUnit") || "years"
+          }`;
+          const units = this.urlParams.get("units") || "metric";
+          const heightDisplay = `${this.urlParams.get("height")} ${
+            units === "metric" ? "cm" : "in"
+          }`;
+          const weightDisplay = `${this.urlParams.get("weight")} ${
+            units === "metric" ? "kg" : "lbs"
+          }`;
+          const measuredAAD = this.urlParams.get("measuredAAD");
+
+          const zScore = document.getElementById("zScoreValue").textContent;
+          const meanAAD = document.getElementById("meanAAD").textContent;
+          const stdDev = document.getElementById("stdDev").textContent;
+          const normalRange =
+            document.getElementById("normalRange").textContent;
 
           const text = `
 GRONINGEN AOV Z-SCORE CALCULATION
@@ -491,10 +538,10 @@ Patient Parameters:
 - Age: ${ageDisplay}
 - Height: ${heightDisplay}
 - Weight: ${weightDisplay}
-${measuredAAD ? `- Measured AAD: ${measuredAAD} mm` : ''}
+${measuredAAD ? `- Measured AAD: ${measuredAAD} mm` : ""}
 
 Results:
-${zScore !== '--' ? `- Z-Score: ${zScore}` : ''}
+${zScore !== "--" ? `- Z-Score: ${zScore}` : ""}
 - Expected AAD: ${meanAAD} ± ${stdDev} mm
 - Normal Range (±2SD): ${normalRange} mm
 
@@ -503,33 +550,36 @@ Source: Groningen GAM model | University of Groningen
 URL: ${window.location.href}
           `.trim();
 
-          navigator.clipboard.writeText(text).then(() => {
-            const btn = document.getElementById('copyResultsBtn');
-            const originalText = btn.textContent;
-            btn.textContent = '✓ Copied!';
-            setTimeout(() => {
-              btn.textContent = originalText;
-            }, 2000);
-          }).catch(() => {
-            alert('Failed to copy to clipboard');
-          });
+          navigator.clipboard
+            .writeText(text)
+            .then(() => {
+              const btn = document.getElementById("copyResultsBtn");
+              const originalText = btn.textContent;
+              btn.textContent = "✓ Copied!";
+              setTimeout(() => {
+                btn.textContent = originalText;
+              }, 2000);
+            })
+            .catch(() => {
+              alert("Failed to copy to clipboard");
+            });
         }
 
         showError(message) {
           // Hide loading state
-          document.getElementById('loadingState').style.display = 'none';
-          
-          const errorDiv = document.getElementById('errorMessage');
-          const errorText = document.getElementById('errorText');
+          document.getElementById("loadingState").style.display = "none";
+
+          const errorDiv = document.getElementById("errorMessage");
+          const errorText = document.getElementById("errorText");
           if (errorDiv && errorText) {
             errorText.textContent = message;
-            errorDiv.style.display = 'flex';
+            errorDiv.style.display = "flex";
           }
         }
       }
 
       // Initialize when DOM is loaded
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         new ResultsManager();
       });
     </script>
