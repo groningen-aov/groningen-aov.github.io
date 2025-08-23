@@ -1,5 +1,5 @@
-const CACHE_NAME = "groningen-aov-v1.0.2"; // ← Update version!
-const DATA_CACHE_NAME = "groningen-aov-data-v1.0.2";
+const CACHE_NAME = "groningen-aov-v1.0.3"; // ← Update version!
+const DATA_CACHE_NAME = "groningen-aov-data-v1.0.3";
 
 // Files to cache for offline functionality - Production file structure
 const FILES_TO_CACHE = [
@@ -28,9 +28,6 @@ const FILES_TO_CACHE = [
 // Development mode detection
 const isDevelopment = location.hostname === 'localhost' || 
                      location.hostname === '127.0.0.1' ||
-                     location.hostname.includes('netlify') ||
-                     location.hostname.includes('vercel') ||
-                     location.hostname.includes('github.io');
 
 // Install event - cache app shell
 self.addEventListener("install", (evt) => {

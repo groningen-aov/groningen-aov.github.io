@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Batch Processing - Groningen AAD Calculator</title>
+    <title>Batch Data Processing - Groningen AAD Calculator</title>
     <link rel="stylesheet" href="../style/pico.blue.min.css" />
     <link rel="stylesheet" href="../style/style.css" />
     <!-- PapaParse CDN for CSV processing -->
@@ -18,41 +18,72 @@
           <li><a href="/" class="contrast">Home</a></li>
           <li><a href="/about/" class="contrast">About</a></li>
           <li><a href="/test/" class="contrast">Test</a></li>
+          <li><a href="/batch/" class="contrast">Batch</a></li>
         </ul>
       </nav>
 
-      <h1>Batch AAD Processing</h1>
-      
+      <h1>Batch Data Processing</h1>
+
       <!-- Online requirement notice -->
       <article>
-        <header>🌐 Online Connection Required</header>
+        <header>Online Connection Required</header>
+      <div id="modelStatus" class="status-loading">
+        <span id="statusIndicator">⏳</span>
+        <span id="statusText">Loading calculation model...</span>
+      </div>
         <p>
           Batch processing requires an internet connection to load the CSV
           parsing library. For offline calculations, use the
           <a href="../">individual calculator</a>.
         </p>
-      </article>  
+      </article>
 
       <!-- Model Status -->
-      <div id="modelStatus" class="status-loading">
-        <span id="statusIndicator">⏳</span>
-        <span id="statusText">Loading calculation model...</span>
-      </div>
 
-      <div class="input-section">
-        <div class="section-title">
-          📊 Method 1: Paste Your Data
-        </div>
-        
-        <div class="format-hint">
-          Required: sex,age,height,weight &nbsp;•&nbsp; Optional: aad<br>
-          <small>✅ Supports comma, tab, or semicolon delimited data</small>
+      <!-- Unified Input Section -->
+      <article class="batch-input-container">
+
+        <div class="format-requirements">
+          <p>
+            <strong>Required columns:</strong> sex, age, height, weight
+            &nbsp;•&nbsp; <strong>Optional:</strong> aad
+          </p>
+          <div class="format-details">
+            <strong>Expected formats:</strong>
+            <ul>
+              <li>
+                <strong>Sex:</strong> M/F, Male/Female, or m/f (case
+                insensitive)
+              </li>
+              <li>
+                <strong>Age:</strong> In years (decimal values accepted, e.g.,
+                0.003 for 1-day-old)
+              </li>
+              <li><strong>Height:</strong> In centimeters (cm)</li>
+              <li><strong>Weight:</strong> In kilograms (kg)</li>
+              <li>
+                <strong>AAD:</strong> In millimeters (mm) - optional for Z-score
+                analysis
+              </li>
+            </ul>
+          </div>
+          <small
+            >Column order doesn't matter as long as headers are included. Paste
+            directly from Excel, Google Sheets, or CSV files. Supports comma,
+            tab, or semicolon delimited data.</small
+          >
         </div>
 
-        <textarea 
-          id="csvInput" 
-          class="text-input" 
-          placeholder="Paste your data here (CSV or tab-delimited from spreadsheets)...
+        <!-- Primary Textarea Interface -->
+        <div class="primary-input-section">
+          <label for="csvInput">
+            <strong>Data Input</strong>
+            <small>Supports large datasets (10,000+ rows tested)</small>
+          </label>
+          <textarea
+            id="csvInput"
+            class="primary-textarea"
+            placeholder="Paste your data here...
 
 With Measured AAD (for Z-scores):
 sex,age,height,weight,aad
@@ -67,111 +98,121 @@ female,25,165,55
 Tab-delimited (from spreadsheets):
 sex	age	height	weight	aad
 male	40	170	70	22.5"
-          oninput="updateRowCounter()"
-        ></textarea>
+            oninput="updateDataFeedback()"
+          ></textarea>
 
-        <div class="row-counter" id="rowCounter">No data entered</div>
+          <!-- Live Feedback Display -->
+          <div id="dataFeedback" class="data-feedback">
+            <div id="statusLine" class="feedback-line">
+              Ready for data entry
+            </div>
+            <div id="detectionLine" class="feedback-line detection-info"></div>
+          </div>
 
-        <div class="button-group">
-          <button class="btn btn-primary" onclick="processData()" id="processBtn">
-            🚀 Process Data
-          </button>
-          <button class="btn btn-outline" onclick="loadExample('csv')">
-            📋 With Measured AAD
-          </button>
-          <button class="btn btn-outline" onclick="loadExample('prediction_only_csv')">
-            🔬 Predictions Only
-          </button>
-          <button class="btn btn-outline" onclick="loadExample('tab')">
-            📄 Tab (Spreadsheet)
-          </button>
-          <button class="btn btn-secondary" onclick="clearData()">
-            🗑️ Clear
-          </button>
+          <!-- Assistive Options -->
+          <div class="assistive-options">
+            <button
+              type="button"
+              onclick="document.getElementById('fileInput').click()"
+              class="secondary outline"
+            >
+              Choose File
+            </button>
+            <button
+              type="button"
+              onclick="loadExample('csv')"
+              class="secondary outline"
+            >
+              Load Example
+            </button>
+            <button
+              type="button"
+              onclick="clearData()"
+              class="secondary outline"
+            >
+              Clear Data
+            </button>
+            <input
+              type="file"
+              id="fileInput"
+              accept=".csv,.txt"
+              onchange="handleFileUpload(event)"
+              style="display: none"
+            />
+          </div>
+
+          <!-- Single Action Button -->
+          <div class="primary-action">
+            <button
+              class="submit-button"
+              onclick="processData()"
+              id="processBtn"
+            >
+              Process Data
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div class="divider">OR</div>
-
-      <div class="input-section">
-        <div class="section-title">
-          📁 Method 2: Upload CSV File
-        </div>
-
-        <div class="file-upload" onclick="document.getElementById('fileInput').click()">
-          <div class="file-upload-icon">📄</div>
-          <p><strong>Click to upload</strong> or drag and drop</p>
-          <p style="color: #6c757d; font-size: 14px; margin-top: 8px;">
-            Supports .csv files up to 10MB
-          </p>
-          <input type="file" id="fileInput" accept=".csv,.txt" onchange="handleFileUpload(event)">
-        </div>
-      </div>
+      </article>
 
       <!-- Processing Status with Pico Loading -->
-      <article id="processingStatus" aria-busy="false" style="display: none;">
+      <article id="processingStatus" aria-busy="false" style="display: none">
         <div class="processing-header">
-          <h3 id="processingTitle">🔄 Processing Batch...</h3>
-          <button onclick="cancelProcessing()" class="btn btn-secondary btn-small">Cancel</button>
+          <h3 id="processingTitle">Processing Batch Data...</h3>
+          <button onclick="cancelProcessing()" class="secondary outline">
+            Cancel
+          </button>
         </div>
-        
+
         <div id="progressContainer" class="progress-container">
           <div class="progress-bar">
             <div id="progressFill" class="progress-fill"></div>
           </div>
           <div id="progressText" class="progress-text">Preparing...</div>
         </div>
-        
+
         <div id="processingDetails" class="processing-details">
-          <small>Estimated time remaining: <span id="timeRemaining">Calculating...</span></small>
+          <small
+            >Estimated time remaining:
+            <span id="timeRemaining">Calculating...</span></small
+          >
         </div>
       </article>
 
       <!-- Results Section -->
-      <div id="resultsSection" class="results-container" style="display: none;">
-        <h3>✅ Processing Complete</h3>
-        
+      <div id="resultsSection" class="results-container" style="display: none">
+        <h3>Processing Complete</h3>
+
         <div id="resultsSummary" class="results-summary">
           <!-- Summary stats will be populated here -->
         </div>
 
         <div class="results-actions">
-          <button onclick="downloadResults()" class="btn btn-primary">
-            💾 Download CSV Results
+          <button onclick="copyTableToClipboard()" class="primary">
+            Copy to Clipboard
           </button>
-          <button onclick="showCopyableTable()" class="btn btn-outline">
-            📋 Copy Results Table
+          <button onclick="downloadResults()" class="outline">
+            Save CSV File
           </button>
-          <button onclick="showAllResults()" class="btn btn-outline">
-            👁️ View All Results
-          </button>
-          <button onclick="resetBatch()" class="btn btn-secondary">
-            🔄 Process New Batch
+          <button onclick="resetBatch()" class="secondary">
+            Process New Batch
           </button>
         </div>
 
-        <!-- Copyable Results Table -->
-        <div id="copyableResults" class="results-preview" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4>Copy-Paste Ready Results</h4>
-            <button onclick="copyTableToClipboard()" class="btn btn-outline btn-small">📋 Copy to Clipboard</button>
-          </div>
-          <div id="copyableTable" class="table-container">
-            <!-- Copyable table will be populated here -->
-          </div>
-          <small id="copyableFormatHint" style="color: var(--pico-muted-color);">
-            Format information will appear here.
+        <!-- Results Table -->
+        <div id="resultsTable" class="results-preview">
+          <small
+            id="copyFormatHint"
+            style="
+              color: var(--pico-muted-color);
+              margin-top: 1rem;
+              display: block;
+            "
+          >
+            Table can be copied to clipboard and pasted directly into
+            spreadsheets.
           </small>
-        </div>
-
-        <!-- Full Results Table -->
-        <div id="allResults" class="results-preview" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h4 id="allResultsTitle">Complete Results</h4>
-            <button onclick="document.getElementById('allResults').style.display='none'" class="btn btn-outline btn-small">✖️ Close</button>
-          </div>
           <div id="allResultsTable" class="table-container">
-            <!-- Full results table will be populated here -->
+            <!-- Results table will be populated here -->
           </div>
         </div>
       </div>
@@ -188,9 +229,9 @@ male	40	170	70	22.5"
       let processingCancelled = false;
       let currentResults = null;
       let inputFormat = {
-        source: 'paste', // 'paste' or 'file'
-        delimiter: ',',   // ',', '\t', or ';'
-        hasAAD: true      // whether input included measured AAD column
+        source: "paste", // 'paste' or 'file'
+        delimiter: ",", // ',', '\t', or ';'
+        hasAAD: true, // whether input included measured AAD column
       };
 
       // Real validated test cases from /test/ - much better than made-up data!
@@ -204,7 +245,7 @@ male,16,175,65,20.2
 female,25,165,55,19.1
 male,55,180,90,25.8
 female,30,155,50,18.9`,
-        
+
         tab: `sex	age	height	weight	aad
 male	40	170	70	22.5
 female	0.003	50	3	6.2
@@ -225,16 +266,6 @@ male,16,175,65
 female,25,165,55
 male,55,180,90
 female,30,155,50`,
-
-        prediction_only_tab: `sex	age	height	weight
-male	40	170	70
-female	0.003	50	3
-male	2	85	12
-female	10	140	35
-male	16	175	65
-female	25	165	55
-male	55	180	90
-female	30	155	50`
       };
 
       // =============================================================================
@@ -253,17 +284,17 @@ female	30	155	50`
 
         async loadModel() {
           try {
-            console.log('Loading calculation model...');
-            const response = await fetch('/data/groningen_aad_lookup.json');
+            console.log("Loading calculation model...");
+            const response = await fetch("/data/groningen_aad_lookup.json");
             if (!response.ok) {
               throw new Error(`Failed to load model: ${response.status}`);
             }
             this.lookupData = await response.json();
             this.isLoaded = true;
-            console.log('Model loaded successfully');
+            console.log("Model loaded successfully");
             return true;
           } catch (error) {
-            console.error('Model loading failed:', error);
+            console.error("Model loading failed:", error);
             throw error;
           }
         }
@@ -272,10 +303,10 @@ female	30	155	50`
           const n = vec.length;
           if (q <= vec[0]) return 0;
           if (q >= vec[n - 1]) return n - 2;
-          
+
           let left = 0;
           let right = n - 1;
-          
+
           while (left < right - 1) {
             const mid = Math.floor((left + right) / 2);
             if (vec[mid] <= q) {
@@ -306,9 +337,12 @@ female	30	155	50`
           const j1 = Math.min(j + 1, nY - 1);
           const k1 = Math.min(k + 1, nZ - 1);
 
-          const x0 = x[i], x1 = x[i1];
-          const y0 = y[j], y1 = y[j1];
-          const z0 = z[k], z1 = z[k1];
+          const x0 = x[i],
+            x1 = x[i1];
+          const y0 = y[j],
+            y1 = y[j1];
+          const z0 = z[k],
+            z1 = z[k1];
 
           const xd = x1 - x0 !== 0 ? (xq - x0) / (x1 - x0) : 0;
           const yd = y1 - y0 !== 0 ? (yq - y0) / (y1 - y0) : 0;
@@ -336,7 +370,7 @@ female	30	155	50`
 
         calculateSinglePatient(age, weight, height, sex, measuredAAD = null) {
           if (!this.isLoaded) {
-            throw new Error('Model not loaded');
+            throw new Error("Model not loaded");
           }
 
           const logWeight = Math.log(weight);
@@ -349,15 +383,25 @@ female	30	155	50`
           const zGrid = this.lookupData.grid_axes.log_age_plus_1;
 
           const meanAAD = this.trilinearInterpolation(
-            xGrid, yGrid, zGrid,
+            xGrid,
+            yGrid,
+            zGrid,
             this.lookupData.predictions.mean_aad,
-            logWeight, sqrtHeight, logAge, sexValue
+            logWeight,
+            sqrtHeight,
+            logAge,
+            sexValue
           );
 
           const stdDev = this.trilinearInterpolation(
-            xGrid, yGrid, zGrid,
+            xGrid,
+            yGrid,
+            zGrid,
             this.lookupData.predictions.std_dev,
-            logWeight, sqrtHeight, logAge, sexValue
+            logWeight,
+            sqrtHeight,
+            logAge,
+            sexValue
           );
 
           const result = {
@@ -365,7 +409,8 @@ female	30	155	50`
             stdDev: stdDev,
             lowerBound: meanAAD - 2 * stdDev,
             upperBound: meanAAD + 2 * stdDev,
-            zScore: null
+            zScore: null,
+            hasMeasuredAAD: measuredAAD !== null && measuredAAD > 0,
           };
 
           if (measuredAAD && measuredAAD > 0) {
@@ -379,23 +424,27 @@ female	30	155	50`
       // =============================================================================
       // INITIALIZATION
       // =============================================================================
-      
+
       async function initializeCalculator() {
         try {
           calculator = new BatchCalculator();
           await calculator.loadModel();
           isModelLoaded = true;
-          
-          document.getElementById('statusIndicator').textContent = '✅';
-          document.getElementById('statusText').textContent = 'Model ready for batch processing';
-          document.getElementById('modelStatus').className = 'status-success';
-          
+
+          document.getElementById("statusIndicator").textContent = "✅";
+          document.getElementById("statusText").textContent =
+            "Model ready for batch processing";
+          document.getElementById("modelStatus").className = "status-success";
         } catch (error) {
-          console.error('Failed to initialize:', error);
-          document.getElementById('statusIndicator').textContent = '❌';
-          document.getElementById('statusText').textContent = 'Model load failed';
-          document.getElementById('modelStatus').className = 'status-error';
-          showStatus('Failed to load calculation model. Please refresh the page.', 'error');
+          console.error("Failed to initialize:", error);
+          document.getElementById("statusIndicator").textContent = "❌";
+          document.getElementById("statusText").textContent =
+            "Model load failed";
+          document.getElementById("modelStatus").className = "status-error";
+          showStatus(
+            "Failed to load calculation model. Please refresh the page.",
+            "error"
+          );
         }
       }
 
@@ -404,61 +453,75 @@ female	30	155	50`
       // =============================================================================
 
       function detectDelimiter(text) {
-        const firstLine = text.split('\n')[0];
-        if (!firstLine) return ',';
-        
+        const firstLine = text.split("\n")[0];
+        if (!firstLine) return ",";
+
         const commaCount = (firstLine.match(/,/g) || []).length;
         const tabCount = (firstLine.match(/\t/g) || []).length;
         const semicolonCount = (firstLine.match(/;/g) || []).length;
-        
-        if (tabCount > 0 && tabCount >= commaCount && tabCount >= semicolonCount) {
-          return '\t';
+
+        if (
+          tabCount > 0 &&
+          tabCount >= commaCount &&
+          tabCount >= semicolonCount
+        ) {
+          return "\t";
         } else if (semicolonCount > commaCount) {
-          return ';';
+          return ";";
         } else {
-          return ',';
+          return ",";
         }
       }
 
       function validateAndCleanData(patients) {
         const errors = [];
         const cleanPatients = [];
-        
+
         patients.forEach((patient, index) => {
           const rowNum = index + 1;
           const cleanPatient = {};
-          
+
           // Clean and validate sex
           if (!patient.sex) {
             errors.push(`Row ${rowNum}: Missing sex value`);
             return;
           }
           const sex = patient.sex.toString().toLowerCase().trim();
-          if (sex.startsWith('m')) {
-            cleanPatient.sex = 'male';
-          } else if (sex.startsWith('f')) {
-            cleanPatient.sex = 'female';
+          if (sex.startsWith("m")) {
+            cleanPatient.sex = "male";
+          } else if (sex.startsWith("f")) {
+            cleanPatient.sex = "female";
           } else {
-            errors.push(`Row ${rowNum}: Invalid sex "${patient.sex}" (use M/F or Male/Female)`);
+            errors.push(
+              `Row ${rowNum}: Invalid sex "${patient.sex}" (use M/F or Male/Female)`
+            );
             return;
           }
 
           // Clean and validate required numeric fields
-          const requiredFields = ['age', 'weight', 'height'];
+          const requiredFields = ["age", "weight", "height"];
           for (const field of requiredFields) {
             const value = parseFloat(patient[field]);
             if (isNaN(value) || value <= 0) {
-              errors.push(`Row ${rowNum}: Invalid ${field} "${patient[field]}" (must be positive number)`);
+              errors.push(
+                `Row ${rowNum}: Invalid ${field} "${patient[field]}" (must be positive number)`
+              );
               return;
             }
             cleanPatient[field] = value;
           }
 
           // AAD is optional! Some researchers just want predictions
-          if (patient.aad !== undefined && patient.aad !== null && patient.aad !== '') {
+          if (
+            patient.aad !== undefined &&
+            patient.aad !== null &&
+            patient.aad !== ""
+          ) {
             const aadValue = parseFloat(patient.aad);
             if (isNaN(aadValue) || aadValue <= 0) {
-              errors.push(`Row ${rowNum}: Invalid AAD "${patient.aad}" (must be positive number or leave blank)`);
+              errors.push(
+                `Row ${rowNum}: Invalid AAD "${patient.aad}" (must be positive number or leave blank)`
+              );
               return;
             }
             cleanPatient.aad = aadValue;
@@ -468,15 +531,21 @@ female	30	155	50`
 
           // Validate ranges (based on model constraints)
           if (cleanPatient.age > 59) {
-            errors.push(`Row ${rowNum}: Age ${cleanPatient.age} exceeds maximum (59 years)`);
+            errors.push(
+              `Row ${rowNum}: Age ${cleanPatient.age} exceeds maximum (59 years)`
+            );
             return;
           }
           if (cleanPatient.weight < 1.34 || cleanPatient.weight > 352) {
-            errors.push(`Row ${rowNum}: Weight ${cleanPatient.weight}kg outside valid range (1.34-352kg)`);
+            errors.push(
+              `Row ${rowNum}: Weight ${cleanPatient.weight}kg outside valid range (1.34-352kg)`
+            );
             return;
           }
           if (cleanPatient.height < 30 || cleanPatient.height > 236) {
-            errors.push(`Row ${rowNum}: Height ${cleanPatient.height}cm outside valid range (30-236cm)`);
+            errors.push(
+              `Row ${rowNum}: Height ${cleanPatient.height}cm outside valid range (30-236cm)`
+            );
             return;
           }
 
@@ -489,23 +558,30 @@ female	30	155	50`
       async function processBatchOnMainThread(patients, progressCallback) {
         const results = [];
         // Dynamic chunk size: smaller chunks for tiny batches, larger for big ones
-        const chunkSize = patients.length < 100 ? Math.max(10, Math.ceil(patients.length / 5)) : 100;
+        const chunkSize =
+          patients.length < 100
+            ? Math.max(10, Math.ceil(patients.length / 5))
+            : 100;
         const startTime = Date.now();
 
         for (let i = 0; i < patients.length; i += chunkSize) {
           if (processingCancelled) {
-            throw new Error('Processing cancelled by user');
+            throw new Error("Processing cancelled by user");
           }
 
           const chunk = patients.slice(i, i + chunkSize);
-          
+
           // Process chunk
           for (const patient of chunk) {
             try {
               const calculation = calculator.calculateSinglePatient(
-                patient.age, patient.weight, patient.height, patient.sex, patient.aad
+                patient.age,
+                patient.weight,
+                patient.height,
+                patient.sex,
+                patient.aad
               );
-              
+
               results.push({
                 ...patient,
                 expectedAAD: calculation.meanAAD,
@@ -514,13 +590,13 @@ female	30	155	50`
                 upperBound: calculation.upperBound,
                 zScore: calculation.zScore,
                 hasMeasuredAAD: calculation.hasMeasuredAAD,
-                status: 'success'
+                status: "success",
               });
             } catch (error) {
               results.push({
                 ...patient,
                 error: error.message,
-                status: 'error'
+                status: "error",
               });
             }
           }
@@ -530,19 +606,19 @@ female	30	155	50`
           const progress = (processed / patients.length) * 100;
           const elapsed = Date.now() - startTime;
           const estimated = elapsed * (patients.length / processed) - elapsed;
-          
+
           if (progressCallback) {
             progressCallback({
               processed,
               total: patients.length,
               progress,
-              timeRemaining: estimated
+              timeRemaining: estimated,
             });
           }
 
           // Brief pause to keep UI responsive (and show progress for small batches)
           if (i + chunkSize < patients.length) {
-            await new Promise(resolve => setTimeout(resolve, 1));
+            await new Promise((resolve) => setTimeout(resolve, 1));
           }
         }
 
@@ -550,84 +626,97 @@ female	30	155	50`
       }
 
       // =============================================================================
-      // UI HELPER FUNCTIONS
+      // PROFESSIONAL UI FUNCTIONS
       // =============================================================================
 
-      function updateRowCounter() {
-        const input = document.getElementById('csvInput').value.trim();
-        const counter = document.getElementById('rowCounter');
-        
+      function updateDataFeedback() {
+        const input = document.getElementById("csvInput").value.trim();
+        const statusLine = document.getElementById("statusLine");
+        const detectionLine = document.getElementById("detectionLine");
+
         if (!input) {
-          counter.textContent = 'No data entered';
+          statusLine.textContent = "Ready for data entry";
+          detectionLine.textContent = "";
           return;
         }
 
-        const lines = input.split('\n').filter(line => line.trim());
+        const lines = input.split("\n").filter((line) => line.trim());
         const delimiter = detectDelimiter(input);
-        const delimiterName = delimiter === '\t' ? 'tab' : delimiter === ';' ? 'semicolon' : 'comma';
-        
-        const hasHeader = lines[0] && lines[0].toLowerCase().includes('sex');
+
+        let delimiterName;
+        switch (delimiter) {
+          case "\t":
+            delimiterName = "Tab-delimited format detected";
+            break;
+          case ";":
+            delimiterName = "Semicolon-delimited format detected";
+            break;
+          default:
+            delimiterName = "Comma-delimited format detected";
+        }
+
+        const hasHeader = lines[0] && lines[0].toLowerCase().includes("sex");
         const dataRows = hasHeader ? lines.length - 1 : lines.length;
-        
+
         // Check if AAD column is present
-        const hasAAD = hasHeader && lines[0].toLowerCase().includes('aad');
-        const mode = hasAAD ? 'with Z-scores' : 'predictions only';
-        
+        const hasAAD = hasHeader && lines[0].toLowerCase().includes("aad");
+
         if (dataRows > 0) {
-          counter.textContent = `${dataRows} patient${dataRows !== 1 ? 's' : ''} ready (${delimiterName}-delimited, ${mode})`;
+          statusLine.textContent = `${dataRows.toLocaleString()} rows detected - ready to process`;
+          statusLine.className = "feedback-line success";
+
+          const mode = hasAAD
+            ? "with measured AAD for Z-score analysis"
+            : "predictions only (research mode)";
+          detectionLine.textContent = `${delimiterName} • ${mode}`;
+          detectionLine.className = "feedback-line detection-info";
         } else {
-          counter.textContent = 'Invalid data format';
+          statusLine.textContent = "Invalid data format";
+          statusLine.className = "feedback-line error";
+          detectionLine.textContent = "";
         }
       }
 
-      function loadExample(format = 'csv') {
+      function loadExample(format = "csv") {
         const data = exampleData[format] || exampleData.csv;
-        document.getElementById('csvInput').value = data;
-        updateRowCounter();
-        
-        const descriptions = {
-          'csv': 'validated test cases with measured AAD values',
-          'prediction_only_csv': 'research mode - predictions only (no measured AAD)',
-          'tab': 'tab-delimited format (like copying from spreadsheets)',
-          'prediction_only_tab': 'tab-delimited predictions only'
-        };
-        
-        const desc = descriptions[format] || 'example data';
-        showStatus(`Loaded ${desc}! Ready to process.`, 'info');
+        document.getElementById("csvInput").value = data;
+        updateDataFeedback();
+
+        showStatus("Sample research data loaded - ready to process.", "info");
       }
 
       function clearData() {
-        document.getElementById('csvInput').value = '';
-        document.getElementById('fileInput').value = '';
-        updateRowCounter();
+        document.getElementById("csvInput").value = "";
+        document.getElementById("fileInput").value = "";
+        updateDataFeedback();
         hideStatus();
         resetProcessingUI();
       }
 
       function showStatus(message, type) {
-        const status = document.getElementById('status');
+        const status = document.getElementById("status");
         status.textContent = message;
         status.className = `status ${type}`;
-        status.style.display = 'block';
+        status.style.display = "block";
       }
 
       function hideStatus() {
-        document.getElementById('status').style.display = 'none';
+        document.getElementById("status").style.display = "none";
       }
 
       function resetProcessingUI() {
-        const processingElement = document.getElementById('processingStatus');
-        processingElement.style.display = 'none';
-        processingElement.setAttribute('aria-busy', 'false');
-        
-        document.getElementById('resultsSection').style.display = 'none';
-        document.getElementById('processBtn').disabled = false;
-        document.getElementById('processBtn').textContent = '🚀 Process Data';
-        
+        const processingElement = document.getElementById("processingStatus");
+        processingElement.style.display = "none";
+        processingElement.setAttribute("aria-busy", "false");
+
+        document.getElementById("resultsSection").style.display = "none";
+        document.getElementById("processBtn").disabled = false;
+        document.getElementById("processBtn").textContent = "Process Data";
+
         // Reset progress container visibility
-        document.getElementById('progressContainer').style.display = 'block';
-        document.getElementById('processingDetails').style.display = 'block';
-        
+        document.getElementById("progressContainer").style.display = "block";
+        document.getElementById("processingDetails").style.display = "block";
+
         processingCancelled = false;
       }
 
@@ -637,15 +726,18 @@ female	30	155	50`
 
       async function processData() {
         if (!isModelLoaded) {
-          showStatus('Model not ready. Please wait for initialization.', 'error');
+          showStatus(
+            "Model not ready. Please wait for initialization.",
+            "error"
+          );
           return;
         }
 
-        const textInput = document.getElementById('csvInput').value.trim();
-        const fileInput = document.getElementById('fileInput').files[0];
+        const textInput = document.getElementById("csvInput").value.trim();
+        const fileInput = document.getElementById("fileInput").files[0];
 
         if (!textInput && !fileInput) {
-          showStatus('Please paste data or upload a file to process.', 'error');
+          showStatus("Please enter data to process.", "error");
           return;
         }
 
@@ -656,71 +748,81 @@ female	30	155	50`
           // Handle file input if provided
           if (fileInput && !textInput) {
             if (fileInput.size > 10 * 1024 * 1024) {
-              showStatus('File too large. Maximum size is 10MB.', 'error');
+              showStatus("File too large. Maximum size is 10MB.", "error");
               return;
             }
 
             csvData = await readFileAsText(fileInput);
-            document.getElementById('csvInput').value = csvData;
-            updateRowCounter();
+            document.getElementById("csvInput").value = csvData;
+            updateDataFeedback();
           }
 
           // Parse CSV data and detect format
           const delimiter = detectDelimiter(csvData);
           inputFormat.delimiter = delimiter;
-          inputFormat.source = fileInput && !textInput ? 'file' : 'paste';
-          
+          inputFormat.source = fileInput && !textInput ? "file" : "paste";
+
           const parseResult = Papa.parse(csvData, {
             header: true,
             delimiter: delimiter,
             dynamicTyping: true,
             skipEmptyLines: true,
-            transformHeader: header => header.trim().toLowerCase()
+            transformHeader: (header) => header.trim().toLowerCase(),
           });
 
           if (parseResult.errors.length > 0) {
-            console.warn('CSV parsing warnings:', parseResult.errors);
+            console.warn("CSV parsing warnings:", parseResult.errors);
           }
 
           const patients = parseResult.data;
           if (patients.length === 0) {
-            showStatus('No valid data rows found in input.', 'error');
+            showStatus("No valid data rows found in input.", "error");
             return;
           }
 
           // Check for required columns - AAD is now optional!
-          const requiredColumns = ['sex', 'age', 'height', 'weight'];
+          const requiredColumns = ["sex", "age", "height", "weight"];
           const availableColumns = Object.keys(patients[0] || {});
-          const missingColumns = requiredColumns.filter(col => !availableColumns.includes(col));
+          const missingColumns = requiredColumns.filter(
+            (col) => !availableColumns.includes(col)
+          );
 
           if (missingColumns.length > 0) {
-            showStatus(`Missing required columns: ${missingColumns.join(', ')}. Required: sex, age, height, weight. Optional: aad`, 'error');
+            showStatus(
+              `Missing required columns: ${missingColumns.join(
+                ", "
+              )}. Required: sex, age, height, weight. Optional: aad`,
+              "error"
+            );
             return;
           }
 
           // Track whether input has AAD column
-          inputFormat.hasAAD = availableColumns.includes('aad');
+          inputFormat.hasAAD = availableColumns.includes("aad");
 
           // Validate and clean data
           const { cleanPatients, errors } = validateAndCleanData(patients);
-          
+
           if (errors.length > 0) {
-            const errorMsg = errors.slice(0, 5).join('\n') + (errors.length > 5 ? `\n... and ${errors.length - 5} more errors` : '');
-            showStatus(`Data validation errors:\n${errorMsg}`, 'error');
+            const errorMsg =
+              errors.slice(0, 5).join("\n") +
+              (errors.length > 5
+                ? `\n... and ${errors.length - 5} more errors`
+                : "");
+            showStatus(`Data validation errors:\n${errorMsg}`, "error");
             return;
           }
 
           if (cleanPatients.length === 0) {
-            showStatus('No valid patients found after validation.', 'error');
+            showStatus("No valid patients found after validation.", "error");
             return;
           }
 
           // Start processing
           await startBatchProcessing(cleanPatients);
-
         } catch (error) {
-          console.error('Processing failed:', error);
-          showStatus(`Processing failed: ${error.message}`, 'error');
+          console.error("Processing failed:", error);
+          showStatus(`Processing failed: ${error.message}`, "error");
           resetProcessingUI();
         }
       }
@@ -728,95 +830,112 @@ female	30	155	50`
       async function startBatchProcessing(patients) {
         const isLargeBatch = patients.length > 500;
         const startTime = Date.now();
-        
+
         // Always show Pico loading spinner - it's beautiful and native!
         // Small batches: Just elegant spinner (300ms minimum for visibility)
         // Large batches: Spinner + detailed progress bar
-        const processingElement = document.getElementById('processingStatus');
-        const progressContainer = document.getElementById('progressContainer');
-        const processingTitle = document.getElementById('processingTitle');
-        
-        processingElement.style.display = 'block';
-        processingElement.setAttribute('aria-busy', 'true');
-        
+        const processingElement = document.getElementById("processingStatus");
+        const progressContainer = document.getElementById("progressContainer");
+        const processingTitle = document.getElementById("processingTitle");
+
+        processingElement.style.display = "block";
+        processingElement.setAttribute("aria-busy", "true");
+
         if (isLargeBatch) {
           // Large batch: Show full progress UI with spinner
-          processingTitle.textContent = '🔄 Processing Large Batch...';
-          progressContainer.style.display = 'block';
-          document.getElementById('processingDetails').style.display = 'block';
+          processingTitle.textContent = "Processing Large Dataset...";
+          progressContainer.style.display = "block";
+          document.getElementById("processingDetails").style.display = "block";
         } else {
           // Small batch: Just show elegant Pico spinner
-          processingTitle.textContent = `⚡ Processing ${patients.length} patients...`;
-          progressContainer.style.display = 'none';
-          document.getElementById('processingDetails').style.display = 'none';
+          processingTitle.textContent = `Processing ${patients.length.toLocaleString()} patients...`;
+          progressContainer.style.display = "none";
+          document.getElementById("processingDetails").style.display = "none";
         }
-        
+
         hideStatus();
 
         const progressCallback = (progress) => {
           if (isLargeBatch) {
             const percentage = Math.round(progress.progress);
-            document.getElementById('progressFill').style.width = `${percentage}%`;
-            document.getElementById('progressText').textContent = 
-              `${progress.processed} of ${progress.total} patients processed (${percentage}%)`;
-            
+            document.getElementById(
+              "progressFill"
+            ).style.width = `${percentage}%`;
+            document.getElementById(
+              "progressText"
+            ).textContent = `${progress.processed.toLocaleString()} of ${progress.total.toLocaleString()} patients processed (${percentage}%)`;
+
             if (progress.timeRemaining > 0) {
               const seconds = Math.ceil(progress.timeRemaining / 1000);
-              document.getElementById('timeRemaining').textContent = `${seconds} seconds`;
+              document.getElementById(
+                "timeRemaining"
+              ).textContent = `${seconds} seconds`;
             }
           }
         };
 
         try {
-          const results = await processBatchOnMainThread(patients, progressCallback);
+          const results = await processBatchOnMainThread(
+            patients,
+            progressCallback
+          );
           const processingTime = Date.now() - startTime;
-          
+
           // For small batches, ensure the spinner is visible for at least 300ms
-          // (Just long enough to see the nice Pico animation!)
           if (!isLargeBatch && processingTime < 300) {
-            await new Promise(resolve => setTimeout(resolve, 300 - processingTime));
+            await new Promise((resolve) =>
+              setTimeout(resolve, 300 - processingTime)
+            );
           }
-          
+
           currentResults = results;
           showResults(results, processingTime);
-          
         } catch (error) {
-          showStatus(`Processing failed: ${error.message}`, 'error');
+          showStatus(`Processing failed: ${error.message}`, "error");
           resetProcessingUI();
         }
       }
 
       function showResults(results, processingTime) {
-        const processingElement = document.getElementById('processingStatus');
-        processingElement.style.display = 'none';
-        processingElement.setAttribute('aria-busy', 'false');
-        
-        document.getElementById('resultsSection').style.display = 'block';
+        const processingElement = document.getElementById("processingStatus");
+        processingElement.style.display = "none";
+        processingElement.setAttribute("aria-busy", "false");
 
-        const successful = results.filter(r => r.status === 'success').length;
-        const failed = results.filter(r => r.status === 'error').length;
-        const withAAD = results.filter(r => r.status === 'success' && r.hasMeasuredAAD).length;
-        const outliers = results.filter(r => r.zScore && Math.abs(r.zScore) > 2).length;
-        
-        // Performance celebration for fast processing!
-        const timeMessage = processingTime < 100 ? 
-          `⚡ Lightning fast: ${processingTime}ms` :
-          processingTime < 500 ?
-          `🚀 Blazing fast: ${processingTime}ms` :
-          `✅ Completed in ${(processingTime/1000).toFixed(1)}s`;
+        document.getElementById("resultsSection").style.display = "block";
+
+        const successful = results.filter((r) => r.status === "success").length;
+        const failed = results.filter((r) => r.status === "error").length;
+        const withAAD = results.filter(
+          (r) => r.status === "success" && r.hasMeasuredAAD
+        ).length;
+        const outliers = results.filter(
+          (r) => r.zScore && Math.abs(r.zScore) > 2
+        ).length;
+
+        // Performance messaging for professional confidence
+        let timeMessage;
+        if (processingTime < 100) {
+          timeMessage = `${processingTime}ms processing time`;
+        } else if (processingTime < 500) {
+          timeMessage = `${processingTime}ms processing time`;
+        } else {
+          timeMessage = `${(processingTime / 1000).toFixed(
+            1
+          )}s processing time`;
+        }
 
         let summaryHtml = `<div class="performance-badge">${timeMessage}</div>`;
-        
+
         if (inputFormat.hasAAD && withAAD > 0) {
           // Show Z-score stats when we have measured AAD values
           summaryHtml += `
             <div class="summary-stats">
               <div class="stat-card">
-                <div class="stat-number">${successful}</div>
+                <div class="stat-number">${successful.toLocaleString()}</div>
                 <div class="stat-label">Successfully Processed</div>
               </div>
               <div class="stat-card">
-                <div class="stat-number">${withAAD}</div>
+                <div class="stat-number">${withAAD.toLocaleString()}</div>
                 <div class="stat-label">With Measured AAD</div>
               </div>
               <div class="stat-card">
@@ -833,7 +952,7 @@ female	30	155	50`
           summaryHtml += `
             <div class="summary-stats">
               <div class="stat-card">
-                <div class="stat-number">${successful}</div>
+                <div class="stat-number">${successful.toLocaleString()}</div>
                 <div class="stat-label">Predictions Generated</div>
               </div>
               <div class="stat-card">
@@ -841,140 +960,128 @@ female	30	155	50`
                 <div class="stat-label">Failed</div>
               </div>
               <div class="stat-card">
-                <div class="stat-number">📊</div>
-                <div class="stat-label">Research Mode</div>
+                <div class="stat-number">Research</div>
+                <div class="stat-label">Mode</div>
               </div>
             </div>`;
         }
 
-        document.getElementById('resultsSummary').innerHTML = summaryHtml;
+        document.getElementById("resultsSummary").innerHTML = summaryHtml;
+
+        // Show full results table immediately
+        showFullResultsTable();
       }
 
-      function showCopyableTable() {
-        const copyableDiv = document.getElementById('copyableResults');
-        const copyableTable = document.getElementById('copyableTable');
-        
-        if (copyableDiv.style.display === 'none') {
-          const successful = currentResults.filter(r => r.status === 'success');
+      function showFullResultsTable() {
+        const allTable = document.getElementById("allResultsTable");
+        const successful = currentResults.filter((r) => r.status === "success");
+
+        // Limit display for large datasets to preserve browser memory
+        const displayLimit = 500;
+        const isLargeDataset = successful.length > displayLimit;
+        const displayResults = isLargeDataset
+          ? successful.slice(0, displayLimit)
+          : successful;
+
+        let html =
+          '<div style="max-height: 500px; overflow: auto;"><table class="striped" id="mainResultsTable"><thead><tr>';
+        html += "<th>Sex</th><th>Age</th><th>Height</th><th>Weight</th>";
+        if (inputFormat.hasAAD) html += "<th>Measured AAD</th>";
+        html += "<th>Expected AAD</th><th>Std Dev</th>";
+        if (inputFormat.hasAAD) html += "<th>Z-Score</th>";
+        html += "<th>Normal Range</th></tr></thead><tbody>";
+
+        displayResults.forEach((result) => {
+          html += "<tr>";
+          html += `<td>${result.sex}</td>`;
+          html += `<td>${result.age}</td>`;
+          html += `<td>${result.height}</td>`;
+          html += `<td>${result.weight}</td>`;
+
+          if (inputFormat.hasAAD) {
+            html += `<td>${result.aad ? result.aad.toFixed(1) : "—"}</td>`;
+          }
+
+          html += `<td><strong>${result.expectedAAD.toFixed(2)}</strong></td>`;
+          html += `<td>${result.stdDev.toFixed(2)}</td>`;
+
+          if (inputFormat.hasAAD) {
+            const zScoreStyle =
+              result.zScore && Math.abs(result.zScore) > 2
+                ? 'style="color: var(--pico-del-color); font-weight: bold;"'
+                : "";
+            html += `<td ${zScoreStyle}>${
+              result.zScore ? result.zScore.toFixed(2) : "—"
+            }</td>`;
+          }
+
+          html += `<td>${result.lowerBound.toFixed(
+            1
+          )} - ${result.upperBound.toFixed(1)}</td>`;
+          html += "</tr>";
+        });
+
+        html += "</tbody></table></div>";
+        allTable.innerHTML = html;
+
+        // Update hint for large datasets
+        const copyHint = document.getElementById("copyFormatHint");
+        if (isLargeDataset) {
+          copyHint.innerHTML = `Showing first ${displayLimit.toLocaleString()} of ${successful.length.toLocaleString()} results to preserve browser memory. <strong>Use "Copy to Clipboard" or "Save CSV File" for complete dataset.</strong>`;
+        } else {
+          copyHint.textContent =
+            "Table can be copied to clipboard and pasted directly into spreadsheets.";
+        }
+      }
+      async function copyTableToClipboard() {
+        try {
+          const successful = currentResults.filter(
+            (r) => r.status === "success"
+          );
           const delimiter = inputFormat.delimiter;
-          const delimiterName = delimiter === '\t' ? 'tab-delimited' : delimiter === ';' ? 'semicolon-delimited' : 'comma-delimited';
-          
+
           // Create header row
-          let headers = ['sex', 'age', 'height', 'weight'];
-          if (inputFormat.hasAAD) headers.push('measured_aad');
-          headers.push('expected_aad', 'std_dev');
-          if (inputFormat.hasAAD) headers.push('z_score');
-          headers.push('lower_bound', 'upper_bound');
-          
+          let headers = ["sex", "age", "height", "weight"];
+          if (inputFormat.hasAAD) headers.push("measured_aad");
+          headers.push("expected_aad", "std_dev");
+          if (inputFormat.hasAAD) headers.push("z_score");
+          headers.push("lower_bound", "upper_bound");
+
           // Create data rows
           const rows = [headers.join(delimiter)];
-          
-          successful.forEach(result => {
-            let row = [
-              result.sex,
-              result.age,
-              result.height,
-              result.weight
-            ];
-            
+
+          successful.forEach((result) => {
+            let row = [result.sex, result.age, result.height, result.weight];
+
             if (inputFormat.hasAAD) {
-              row.push(result.aad ? result.aad.toFixed(1) : '');
+              row.push(result.aad ? result.aad.toFixed(1) : "");
             }
-            
-            row.push(
-              result.expectedAAD.toFixed(3),
-              result.stdDev.toFixed(3)
-            );
-            
+
+            row.push(result.expectedAAD.toFixed(3), result.stdDev.toFixed(3));
+
             if (inputFormat.hasAAD) {
-              row.push(result.zScore ? result.zScore.toFixed(3) : '');
+              row.push(result.zScore ? result.zScore.toFixed(3) : "");
             }
-            
+
             row.push(
               result.lowerBound.toFixed(3),
               result.upperBound.toFixed(3)
             );
-            
+
             rows.push(row.join(delimiter));
           });
-          
-          const tableText = rows.join('\n');
-          
-          copyableTable.innerHTML = `
-            <textarea readonly style="width: 100%; min-height: 300px; font-family: monospace; font-size: 0.9rem; white-space: pre; overflow: auto;">${tableText}</textarea>
-          `;
-          
-          // Update the description
-          document.getElementById('copyableFormatHint').textContent = 
-            `This table is ${delimiterName} and can be copied directly back to spreadsheets. Select all text and copy (Ctrl+A, Ctrl+C).`;
-          
-          copyableDiv.style.display = 'block';
-        } else {
-          copyableDiv.style.display = 'none';
-        }
-      }
 
-      function showAllResults() {
-        const allDiv = document.getElementById('allResults');
-        const allTable = document.getElementById('allResultsTable');
-        const allTitle = document.getElementById('allResultsTitle');
-        
-        if (allDiv.style.display === 'none') {
-          const successful = currentResults.filter(r => r.status === 'success');
-          
-          // Update the title with actual count
-          allTitle.textContent = `Complete Results (All ${currentResults.length} patients)`;
-          
-          let html = '<div style="max-height: 500px; overflow: auto;"><table class="striped"><thead><tr>';
-          html += '<th>Sex</th><th>Age</th><th>Height</th><th>Weight</th>';
-          if (inputFormat.hasAAD) html += '<th>Measured AAD</th>';
-          html += '<th>Expected AAD</th><th>Std Dev</th>';
-          if (inputFormat.hasAAD) html += '<th>Z-Score</th>';
-          html += '<th>Normal Range</th></tr></thead><tbody>';
-          
-          successful.forEach(result => {
-            html += '<tr>';
-            html += `<td>${result.sex}</td>`;
-            html += `<td>${result.age}</td>`;
-            html += `<td>${result.height}</td>`;
-            html += `<td>${result.weight}</td>`;
-            
-            if (inputFormat.hasAAD) {
-              html += `<td>${result.aad ? result.aad.toFixed(1) : '—'}</td>`;
-            }
-            
-            html += `<td><strong>${result.expectedAAD.toFixed(2)}</strong></td>`;
-            html += `<td>${result.stdDev.toFixed(2)}</td>`;
-            
-            if (inputFormat.hasAAD) {
-              const zScoreStyle = result.zScore && Math.abs(result.zScore) > 2 ? 
-                'style="color: var(--pico-del-color); font-weight: bold;"' : '';
-              html += `<td ${zScoreStyle}>${result.zScore ? result.zScore.toFixed(2) : '—'}</td>`;
-            }
-            
-            html += `<td>${result.lowerBound.toFixed(1)} - ${result.upperBound.toFixed(1)}</td>`;
-            html += '</tr>';
-          });
-          
-          html += '</tbody></table></div>';
-          allTable.innerHTML = html;
-          allDiv.style.display = 'block';
-        } else {
-          allDiv.style.display = 'none';
-        }
-      }
-
-      async function copyTableToClipboard() {
-        try {
-          const textarea = document.querySelector('#copyableTable textarea');
-          await navigator.clipboard.writeText(textarea.value);
-          showStatus('✅ Table copied to clipboard! You can paste it directly into spreadsheets.', 'success');
+          const tableText = rows.join("\n");
+          await navigator.clipboard.writeText(tableText);
+          showStatus(
+            "Table copied to clipboard - ready to paste into spreadsheets.",
+            "success"
+          );
         } catch (error) {
-          // Fallback for older browsers
-          const textarea = document.querySelector('#copyableTable textarea');
-          textarea.select();
-          document.execCommand('copy');
-          showStatus('📋 Table selected. Press Ctrl+C (Cmd+C on Mac) to copy.', 'info');
+          showStatus(
+            "Failed to copy to clipboard. Please try the Save CSV File option instead.",
+            "error"
+          );
         }
       }
 
@@ -982,59 +1089,60 @@ female	30	155	50`
         if (!currentResults) return;
 
         // Create headers based on input format
-        let csvHeaders = ['sex', 'age', 'height', 'weight'];
-        if (inputFormat.hasAAD) csvHeaders.push('measured_aad');
-        csvHeaders.push('expected_aad', 'std_dev');
-        if (inputFormat.hasAAD) csvHeaders.push('z_score');
-        csvHeaders.push('lower_bound', 'upper_bound', 'status');
-        
-        const csvData = currentResults.map(result => {
-          if (result.status === 'error') {
-            let row = [result.sex || '', result.age || '', result.height || '', result.weight || ''];
-            if (inputFormat.hasAAD) row.push(result.aad || '');
-            row.push('', '', '');
-            if (inputFormat.hasAAD) row.push('');
-            row.push('', '', 'error: ' + result.error);
+        let csvHeaders = ["sex", "age", "height", "weight"];
+        if (inputFormat.hasAAD) csvHeaders.push("measured_aad");
+        csvHeaders.push("expected_aad", "std_dev");
+        if (inputFormat.hasAAD) csvHeaders.push("z_score");
+        csvHeaders.push("lower_bound", "upper_bound", "status");
+
+        const csvData = currentResults.map((result) => {
+          if (result.status === "error") {
+            let row = [
+              result.sex || "",
+              result.age || "",
+              result.height || "",
+              result.weight || "",
+            ];
+            if (inputFormat.hasAAD) row.push(result.aad || "");
+            row.push("", "", "");
+            if (inputFormat.hasAAD) row.push("");
+            row.push("", "", "error: " + result.error);
             return row;
           }
-          
-          let row = [
-            result.sex,
-            result.age,
-            result.height,
-            result.weight
-          ];
-          
+
+          let row = [result.sex, result.age, result.height, result.weight];
+
           if (inputFormat.hasAAD) {
-            row.push(result.aad ? result.aad.toFixed(1) : '');
+            row.push(result.aad ? result.aad.toFixed(1) : "");
           }
-          
-          row.push(
-            result.expectedAAD.toFixed(3),
-            result.stdDev.toFixed(3)
-          );
-          
+
+          row.push(result.expectedAAD.toFixed(3), result.stdDev.toFixed(3));
+
           if (inputFormat.hasAAD) {
-            row.push(result.zScore ? result.zScore.toFixed(3) : '');
+            row.push(result.zScore ? result.zScore.toFixed(3) : "");
           }
-          
+
           row.push(
             result.lowerBound.toFixed(3),
             result.upperBound.toFixed(3),
             result.status
           );
-          
+
           return row;
         });
 
-        const csvContent = [csvHeaders, ...csvData].map(row => row.join(',')).join('\n');
-        
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const csvContent = [csvHeaders, ...csvData]
+          .map((row) => row.join(","))
+          .join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        const mode = inputFormat.hasAAD ? 'with_zscore' : 'predictions_only';
-        a.download = `groningen_aad_batch_${mode}_${new Date().toISOString().split('T')[0]}.csv`;
+        const mode = inputFormat.hasAAD ? "with_zscore" : "predictions_only";
+        a.download = `groningen_aad_batch_${mode}_${
+          new Date().toISOString().split("T")[0]
+        }.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1042,19 +1150,32 @@ female	30	155	50`
       }
 
       function resetBatch() {
+        // Clear results data
         currentResults = null;
+
+        // Reset input format
         inputFormat = {
-          source: 'paste',
-          delimiter: ',',
-          hasAAD: true
+          source: "paste",
+          delimiter: ",",
+          hasAAD: true,
         };
+
+        // Clear DOM content to free memory
+        document.getElementById("allResultsTable").innerHTML = "";
+        document.getElementById("copyFormatHint").textContent = "";
+
         resetProcessingUI();
         clearData();
+
+        // Suggest garbage collection (helps with large datasets)
+        if (window.gc) {
+          window.gc();
+        }
       }
 
       function cancelProcessing() {
         processingCancelled = true;
-        showStatus('Processing cancelled by user.', 'info');
+        showStatus("Processing cancelled by user.", "info");
         resetProcessingUI();
       }
 
@@ -1065,7 +1186,7 @@ female	30	155	50`
       function readFileAsText(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = e => resolve(e.target.result);
+          reader.onload = (e) => resolve(e.target.result);
           reader.onerror = reject;
           reader.readAsText(file);
         });
@@ -1074,51 +1195,140 @@ female	30	155	50`
       function handleFileUpload(event) {
         const file = event.target.files[0];
         if (file) {
-          showStatus(`📁 File selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'info');
+          if (file.size > 10 * 1024 * 1024) {
+            showStatus("File too large. Maximum size is 10MB.", "error");
+            return;
+          }
+
+          readFileAsText(file)
+            .then((content) => {
+              document.getElementById("csvInput").value = content;
+              updateDataFeedback();
+              showStatus(
+                `File loaded: ${file.name} (${(file.size / 1024).toFixed(
+                  1
+                )} KB)`,
+                "info"
+              );
+            })
+            .catch((error) => {
+              showStatus("Failed to read file.", "error");
+            });
         }
       }
-
-      // =============================================================================
-      // DRAG AND DROP
-      // =============================================================================
-
-      const fileUpload = document.querySelector('.file-upload');
-      
-      fileUpload.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileUpload.style.borderColor = '#667eea';
-        fileUpload.style.background = '#f8f9ff';
-      });
-
-      fileUpload.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        fileUpload.style.borderColor = '#e9ecef';
-        fileUpload.style.background = 'transparent';
-      });
-
-      fileUpload.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileUpload.style.borderColor = '#e9ecef';
-        fileUpload.style.background = 'transparent';
-        
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-          document.getElementById('fileInput').files = files;
-          handleFileUpload({ target: { files: files } });
-        }
-      });
 
       // =============================================================================
       // INITIALIZATION
       // =============================================================================
 
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         initializeCalculator();
       });
     </script>
 
     <style>
-      /* Additional styles for batch processing */
+      /* Professional Medical Interface Styling */
+      .batch-input-container {
+        margin-bottom: 2rem;
+      }
+
+      .format-requirements {
+        background: var(--pico-card-sectioning-background-color);
+        padding: 1rem;
+        border-radius: var(--pico-border-radius);
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--pico-primary);
+      }
+
+      .format-details {
+        margin: 0.75rem 0;
+      }
+
+      .format-details ul {
+        margin: 0.5rem 0 0 1rem;
+        padding-left: 0;
+      }
+
+      .format-details li {
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+      }
+
+      .primary-input-section {
+        position: relative;
+      }
+
+      /* Primary Textarea - 70% Visual Weight */
+      .primary-textarea {
+        min-height: 200px;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        resize: vertical;
+        margin-bottom: 0.75rem;
+        border: 2px solid var(--pico-form-element-border-color);
+        transition: border-color var(--pico-transition);
+      }
+
+      .primary-textarea:focus {
+        border-color: var(--pico-primary);
+        box-shadow: 0 0 0 var(--pico-outline-width)
+          var(--pico-form-element-focus-color);
+      }
+
+      /* Live Feedback System */
+      .data-feedback {
+        background: var(--pico-card-sectioning-background-color);
+        padding: 0.75rem 1rem;
+        border-radius: var(--pico-border-radius);
+        margin-bottom: 1rem;
+        border-left: 3px solid var(--pico-muted-border-color);
+        font-size: 0.9rem;
+      }
+
+      .feedback-line {
+        margin: 0.25rem 0;
+        font-weight: 500;
+      }
+
+      .feedback-line.success {
+        color: var(--pico-ins-color);
+      }
+
+      .feedback-line.error {
+        color: var(--pico-del-color);
+      }
+
+      .detection-info {
+        color: var(--pico-muted-color);
+        font-size: 0.85rem;
+      }
+
+      /* Assistive Options - Secondary Visual Weight */
+      .assistive-options {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .assistive-options button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
+      /* Primary Action Button */
+      .primary-action {
+        text-align: center;
+      }
+
+      .primary-action .submit-button {
+        min-width: 200px;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      /* Status Indicators */
       .status-loading {
         padding: 1rem;
         background: var(--pico-card-background-color);
@@ -1137,8 +1347,7 @@ female	30	155	50`
         color: var(--pico-del-color);
       }
 
-
-
+      /* Processing Interface */
       .processing-header {
         display: flex;
         justify-content: space-between;
@@ -1148,11 +1357,6 @@ female	30	155	50`
 
       .processing-header h3 {
         margin: 0;
-      }
-
-      .btn-small {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
       }
 
       .progress-container {
@@ -1185,11 +1389,13 @@ female	30	155	50`
         color: var(--pico-muted-color);
       }
 
+      /* Results Display */
       .results-container {
         background: var(--pico-card-background-color);
         padding: 1.5rem;
         border-radius: var(--pico-border-radius);
         margin: 1rem 0;
+        border-top: 4px solid var(--pico-primary);
       }
 
       .results-summary {
@@ -1198,15 +1404,13 @@ female	30	155	50`
 
       .performance-badge {
         display: inline-block;
-        background: linear-gradient(135deg, var(--pico-primary), var(--pico-primary-hover-background));
+        background: var(--pico-primary);
         color: white;
         padding: 0.5rem 1rem;
-        border-radius: 20px;
+        border-radius: var(--pico-border-radius);
         font-size: 0.875rem;
         font-weight: 600;
         margin-bottom: 1rem;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
 
       .summary-stats {
@@ -1221,10 +1425,11 @@ female	30	155	50`
         padding: 1rem;
         background: var(--pico-card-sectioning-background-color);
         border-radius: var(--pico-border-radius);
+        border: 1px solid var(--pico-muted-border-color);
       }
 
       .stat-number {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: bold;
         color: var(--pico-primary);
         margin-bottom: 0.25rem;
@@ -1233,6 +1438,7 @@ female	30	155	50`
       .stat-label {
         font-size: 0.875rem;
         color: var(--pico-muted-color);
+        font-weight: 500;
       }
 
       .results-actions {
@@ -1253,58 +1459,29 @@ female	30	155	50`
         margin-top: 1rem;
       }
 
-      .file-upload {
-        cursor: pointer;
-      }
-
-      .button-group {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .divider {
-        text-align: center;
-        margin: 2rem 0;
-        position: relative;
-        color: var(--pico-muted-color);
-      }
-
-      .divider::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: var(--pico-muted-border-color);
-        z-index: 1;
-      }
-
-      .divider {
-        background: var(--pico-background-color);
-        padding: 0 1rem;
-        z-index: 2;
-        position: relative;
-      }
-
+      /* Mobile Responsiveness */
       @media (max-width: 768px) {
         .results-actions {
           flex-direction: column;
         }
-        
-        .button-group {
+
+        .assistive-options {
           flex-direction: column;
         }
-        
+
         .summary-stats {
           grid-template-columns: 1fr;
         }
-        
+
         .processing-header {
           flex-direction: column;
           gap: 1rem;
           text-align: center;
+        }
+
+        .primary-textarea {
+          min-height: 150px;
+          font-size: 0.85rem;
         }
       }
     </style>

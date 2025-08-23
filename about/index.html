@@ -36,6 +36,8 @@
                 <li><a href="/" class="contrast">Home</a></li>
                 <li><a href="/about/" class="contrast">About</a></li>
                 <li><a href="/test/" class="contrast">Test</a></li>
+                <li><a href="/batch/" class="contrast">Batch</a></li>
+
             </ul>
         </nav>
 
@@ -101,6 +103,50 @@
         </article>
       </section>
 
+      <!-- How to Cite Section -->
+      <section id="citation">
+        <article>
+          <header>
+            <h2>How to Cite</h2>
+          </header>
+
+          <p>
+            When using this calculator in research, clinical studies, or publications, 
+            please cite the underlying research and methodology.
+          </p>
+
+          <div class="citation-box">
+            <h3>Citation</h3>
+            <blockquote>
+              <strong>van Melle JP, Dijkshoorn L, Grzegorczyk MA, Dyar D, Ebels T, Lunter G.</strong><br>
+              "Modeling the expected aortic annulus diameter from 75,142 donor records: 
+              a new standard for normalization in children and adults."<br>
+              <em>[Journal Name]. [Year];[Volume]([Issue]):[Pages].</em>
+            </blockquote>
+
+            <details style="margin-top: 1rem;">
+              <summary><strong>BibTeX Format</strong></summary>
+              <pre style="background: var(--pico-card-sectioning-background-color); padding: 1rem; border-radius: var(--pico-border-radius); margin-top: 0.5rem; font-size: 0.875rem;">@article{vanmelle2024aortic,
+  title={Modeling the expected aortic annulus diameter from 75,142 donor records: a new standard for normalization in children and adults},
+  author={van Melle, Joost P and Dijkshoorn, Leah and Grzegorczyk, Marco A and Dyar, Dan and Ebels, Tjark and Lunter, Gerton},
+  journal={[Journal Name]},
+  volume={[Volume]},
+  number={[Issue]},
+  pages={[Pages]},
+  year={[Year]},
+  publisher={[Publisher]}
+}</pre>
+            </details>
+          </div>
+
+          <div style="background: var(--pico-ins-background-color); color: var(--pico-ins-color); padding: 1rem; border-radius: var(--pico-border-radius); margin-top: 1rem;">
+            <strong>Note:</strong> Citation details will be updated once the article is published. 
+            For current research, please reference this calculator as "Groningen AAD Calculator" 
+            and include the URL: <code>https://groningen-aov.github.io</code>
+          </div>
+        </article>
+      </section>
+
       <!-- Clinical Applications -->
       <section>
         <article>
@@ -114,6 +160,17 @@
             <li><strong>Congenital Heart Surgery:</strong> Planning reconstructive procedures</li>
             <li><strong>Research Applications:</strong> Normalizing measurements across populations</li>
             <li><strong>Quality Assurance:</strong> Validating echocardiographic measurements</li>
+          </ul>
+
+          <h3>Individual vs. Batch Processing</h3>
+          <p>
+            This calculator offers two processing modes to accommodate different clinical and research workflows:
+          </p>
+          <ul>
+            <li><strong>Individual Calculator:</strong> Single-patient calculations for clinical decision making</li>
+            <li><strong><a href="/batch/">Batch Data Processing</a>:</strong> High-performance processing of large datasets 
+                (tested with 10,000+ patients) for research studies, quality assurance projects, 
+                and population-level analysis</li>
           </ul>
 
           <h3>Model Inputs</h3>
@@ -162,6 +219,12 @@
             All calculations are validated against the original R model with comprehensive 
             test cases spanning the full range of input parameters. The implementation 
             maintains precision within 0.001 tolerance of the reference implementation.
+          </p>
+
+          <h3>Performance</h3>
+          <p>
+            The batch processing system delivers high-performance calculations suitable for large-scale research, 
+            with processing speeds of over 4,000 patients per second on modern hardware.
           </p>
         </article>
       </section>
@@ -232,5 +295,31 @@
 
     <!-- Version management -->
     <script src="../js/version.js"></script>
+
+    <style>
+      .citation-box {
+        background: var(--pico-card-sectioning-background-color);
+        padding: 1.5rem;
+        border-radius: var(--pico-border-radius);
+        border-left: 4px solid var(--pico-primary);
+        margin: 1rem 0;
+      }
+
+      .citation-box h3 {
+        margin-top: 0;
+        color: var(--pico-primary);
+      }
+
+      .citation-box blockquote {
+        margin-bottom: 0;
+        border-left: none;
+        padding-left: 0;
+        background: none;
+      }
+
+      #citation {
+        scroll-margin-top: 2rem;
+      }
+    </style>
   </body>
 </html>
