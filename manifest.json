@@ -3,7 +3,7 @@
   "short_name": "AOV Calculator",
   "description": "Calculate aortic annulus diameter z-scores using the Groningen GAM model",
   "start_url": "/",
-  "display": "standalone",
+  "display": "minimal-ui",
   "orientation": "portrait-primary",
   "theme_color": "#0172ad",
   "background_color": "#ffffff",
