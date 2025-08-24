@@ -27,10 +27,10 @@
       <!-- Online requirement notice -->
       <article>
         <header>Online Connection Required</header>
-      <div id="modelStatus" class="status-loading">
-        <span id="statusIndicator">⏳</span>
-        <span id="statusText">Loading calculation model...</span>
-      </div>
+        <div id="modelStatus" class="status-loading">
+          <span id="statusIndicator">⏳</span>
+          <span id="statusText">Loading calculation model...</span>
+        </div>
         <p>
           Batch processing requires an internet connection to load the CSV
           parsing library. For offline calculations, use the
@@ -42,7 +42,6 @@
 
       <!-- Unified Input Section -->
       <article class="batch-input-container">
-
         <div class="format-requirements">
           <p>
             <strong>Required columns:</strong> sex, age, height, weight
@@ -219,6 +218,18 @@ male	40	170	70	22.5"
 
       <div id="status" class="status"></div>
     </main>
+    <!-- Footer -->
+    <footer class="container">
+      <small>
+        <p>
+          <em
+            >For clinical decision support only. Always verify with
+            institutional protocols.</em
+          >
+        </p>
+      </small>
+    </footer>
+    <script src="../js/version.js"></script>
 
     <script>
       // =============================================================================
@@ -1071,7 +1082,17 @@ female,30,155,50`,
             rows.push(row.join(delimiter));
           });
 
-          const tableText = rows.join("\n");
+          // Add citation header for research provenance
+          const citationHeader = [
+            "# Groningen AAD Calculator Results",
+            "# Citation: [To be updated upon publication]",
+            "# Calculator: https://groningen-aov.github.io",
+            "# Generated: " + new Date().toISOString().split("T")[0],
+            "#",
+          ].join("\n");
+
+          const tableText = citationHeader + "\n" + rows.join("\n");
+
           await navigator.clipboard.writeText(tableText);
           showStatus(
             "Table copied to clipboard - ready to paste into spreadsheets.",
@@ -1131,9 +1152,23 @@ female,30,155,50`,
           return row;
         });
 
-        const csvContent = [csvHeaders, ...csvData]
-          .map((row) => row.join(","))
-          .join("\n");
+        // Create citation header for research provenance
+        const citationHeader = [
+          "# Groningen AAD Calculator - Batch Processing Results",
+          "# Citation: [To be updated upon publication]",
+          "# Calculator: https://groningen-aov.github.io",
+          "# Generated: " + new Date().toISOString(),
+          "# Processed: " +
+            currentResults.length.toLocaleString() +
+            " patients",
+          "#",
+        ];
+
+        const csvContent = [
+          ...citationHeader,
+          csvHeaders.join(","),
+          ...csvData.map((row) => row.join(",")),
+        ].join("\n");
 
         const blob = new Blob([csvContent], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
@@ -1148,7 +1183,6 @@ female,30,155,50`,
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }
-
       function resetBatch() {
         // Clear results data
         currentResults = null;
