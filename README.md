@@ -1,7 +1,7 @@
 # Groningen AOV Z-Score Calculator
 
 [![PWA](https://img.shields.io/badge/PWA-Ready-blue.svg)](https://web.dev/progressive-web-apps/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Deployment](https://img.shields.io/badge/Deployment-GitHub%20Pages-green.svg)](https://groningen-aov.github.io/)
 
 A mobile-friendly Progressive Web App (PWA) for calculating aortic annulus diameter (AAD) Z-scores using the sophisticated Groningen GAM model. This clinical decision support tool enables healthcare providers to predict expected aortic valve dimensions and assess patient measurements in offline environments.
