@@ -24,29 +24,27 @@
     <link rel="manifest" href="../manifest.json" />
   </head>
   <body>
-    <!-- Navigation -->
-    <nav class="container-fluid">
-      <ul>
-        <li><a href="/" class="secondary">Home</a></li>
-        <li><a href="/about/" class="secondary">About</a></li>
-        <li><a href="/test/" class="secondary">Test</a></li>
-        <li>
-          <div class="status">
-            <span class="status-indicator" id="status-indicator" style="color: var(--pico-primary);">●</span>
-            <span>Ready</span>
-          </div>
-        </li>
-      </ul>
-    </nav>
-
     <!-- Main container -->
     <main class="container">
+      <nav>
+        <ul>
+          <li><strong>Groningen AOV Calculator</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/" class="contrast">Home</a></li>
+          <li><a href="/about/" class="contrast">About</a></li>
+          <li><a href="/test/" class="contrast">Test</a></li>
+          <li><a href="/batch/" class="contrast">Batch</a></li>
+        </ul>
+      </nav>
+
       <!-- Header -->
       <header>
         <hgroup>
           <h1>Validation Test Cases</h1>
           <p>
-            Verify calculator accuracy against validated reference values from the interpolated R model
+            Verify calculator accuracy against validated reference values from
+            the interpolated R model
           </p>
         </hgroup>
       </header>
@@ -57,31 +55,45 @@
           <header>
             <h2>Model Validation</h2>
           </header>
-          
+
           <p>
-            These test cases validate the JavaScript implementation against the interpolated 
-            Groningen GAM model. The interpolated model approximates the original GAM with 
-            &lt;0.5% relative error while providing fast calculations. All JavaScript results 
-            should match interpolated values within 0.001 tolerance.
+            These test cases validate the JavaScript implementation against the
+            interpolated Groningen GAM model. The interpolated model
+            approximates the original GAM with &lt;0.5% relative error while
+            providing fast calculations. All JavaScript results should match
+            interpolated values within 0.001 tolerance.
           </p>
 
-          <div style="text-align: center; margin: 2rem 0;">
-            <button type="button" class="primary" id="runTestsBtn" onclick="runAllTests()">
+          <div style="text-align: center; margin: 2rem 0">
+            <button
+              type="button"
+              class="primary"
+              id="runTestsBtn"
+              onclick="runAllTests()"
+            >
               Run All Test Cases
             </button>
-            <button type="button" class="outline" id="clearResultsBtn" onclick="clearResults()">
+            <button
+              type="button"
+              class="outline"
+              id="clearResultsBtn"
+              onclick="clearResults()"
+            >
               Clear Results
             </button>
           </div>
 
           <!-- Test Status -->
-          <div id="testStatus" style="display: none; text-align: center; margin: 1rem 0;">
+          <div
+            id="testStatus"
+            style="display: none; text-align: center; margin: 1rem 0"
+          >
             <progress id="testProgress"></progress>
             <p id="testStatusText">Running tests...</p>
           </div>
 
           <!-- Test Summary -->
-          <div id="testSummary" style="display: none;">
+          <div id="testSummary" style="display: none">
             <!-- Will be populated with results -->
           </div>
         </article>
@@ -95,7 +107,13 @@
           </header>
 
           <div id="testResults">
-            <p style="text-align: center; color: var(--pico-muted-color); font-style: italic;">
+            <p
+              style="
+                text-align: center;
+                color: var(--pico-muted-color);
+                font-style: italic;
+              "
+            >
               Click "Run All Test Cases" to validate the calculator
             </p>
           </div>
@@ -108,10 +126,13 @@
           <header>
             <h2>Reference Test Cases</h2>
           </header>
-          
-          <p>The following validated test cases span the full range of model inputs:</p>
 
-          <div style="overflow-x: auto;">
+          <p>
+            The following validated test cases span the full range of model
+            inputs:
+          </p>
+
+          <div style="overflow-x: auto">
             <table class="striped">
               <thead>
                 <tr>
@@ -219,11 +240,12 @@
             </table>
           </div>
 
-          <p style="margin-top: 1rem;">
+          <p style="margin-top: 1rem">
             <small>
-              <strong>Note:</strong> Expected values are from the validated interpolated R model.
-              JavaScript results should match within ±0.001 tolerance. The interpolated model 
-              approximates the original GAM with excellent accuracy (&lt;0.5% relative error).
+              <strong>Note:</strong> Expected values are from the validated
+              interpolated R model. JavaScript results should match within
+              ±0.001 tolerance. The interpolated model approximates the original
+              GAM with excellent accuracy (&lt;0.5% relative error).
             </small>
           </p>
         </article>
@@ -235,26 +257,56 @@
           <header>
             <h2>Quick Test Links</h2>
           </header>
-          
+
           <p>Click these links to test specific cases in the calculator:</p>
 
-          <div style="display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-            <a href="/results/?sex=male&age=1&ageUnit=days&height=50&weight=3.5&units=metric" class="secondary" role="button">
+          <div
+            style="
+              display: grid;
+              gap: 0.5rem;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            "
+          >
+            <a
+              href="/results/?sex=male&age=1&ageUnit=days&height=50&weight=3.5&units=metric"
+              class="secondary"
+              role="button"
+            >
               Newborn Male (≈1d, 3.5kg, 50cm)
             </a>
-            <a href="/results/?sex=female&age=1&ageUnit=years&height=75&weight=10&units=metric" class="secondary" role="button">
+            <a
+              href="/results/?sex=female&age=1&ageUnit=years&height=75&weight=10&units=metric"
+              class="secondary"
+              role="button"
+            >
               Infant Female (1y, 10kg, 75cm)
             </a>
-            <a href="/results/?sex=male&age=3&ageUnit=years&height=95&weight=15&units=metric" class="secondary" role="button">
+            <a
+              href="/results/?sex=male&age=3&ageUnit=years&height=95&weight=15&units=metric"
+              class="secondary"
+              role="button"
+            >
               Toddler Male (3y, 15kg, 95cm)
             </a>
-            <a href="/results/?sex=female&age=8&ageUnit=years&height=125&weight=25&units=metric" class="secondary" role="button">
+            <a
+              href="/results/?sex=female&age=8&ageUnit=years&height=125&weight=25&units=metric"
+              class="secondary"
+              role="button"
+            >
               School-age Female (8y, 25kg, 125cm)
             </a>
-            <a href="/results/?sex=male&age=15&ageUnit=years&height=165&weight=55&units=metric" class="secondary" role="button">
+            <a
+              href="/results/?sex=male&age=15&ageUnit=years&height=165&weight=55&units=metric"
+              class="secondary"
+              role="button"
+            >
               Adolescent Male (15y, 55kg, 165cm)
             </a>
-            <a href="/results/?sex=male&age=45&ageUnit=years&height=190&weight=150&units=metric" class="secondary" role="button">
+            <a
+              href="/results/?sex=male&age=45&ageUnit=years&height=190&weight=150&units=metric"
+              class="secondary"
+              role="button"
+            >
               Very Large Male (45y, 150kg, 190cm)
             </a>
           </div>
@@ -267,32 +319,51 @@
           <header>
             <h2>Model Information</h2>
           </header>
-          
-          <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-            <div style="padding: 1rem; background: var(--pico-card-background-color); border-radius: var(--pico-border-radius);">
+
+          <div
+            style="
+              display: grid;
+              gap: 1rem;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            "
+          >
+            <div
+              style="
+                padding: 1rem;
+                background: var(--pico-card-background-color);
+                border-radius: var(--pico-border-radius);
+              "
+            >
               <h4>Interpolation Accuracy</h4>
               <p>
-                <strong>Mean error:</strong> &lt;0.05mm (0.3% relative)<br>
-                <strong>Max error:</strong> 0.12mm (0.57% relative)<br>
+                <strong>Mean error:</strong> &lt;0.05mm (0.3% relative)<br />
+                <strong>Max error:</strong> 0.12mm (0.57% relative)<br />
                 <strong>All cases:</strong> &lt;1% relative error
               </p>
             </div>
-            
-            <div style="padding: 1rem; background: var(--pico-card-background-color); border-radius: var(--pico-border-radius);">
+
+            <div
+              style="
+                padding: 1rem;
+                background: var(--pico-card-background-color);
+                border-radius: var(--pico-border-radius);
+              "
+            >
               <h4>Clinical Coverage</h4>
               <p>
-                <strong>Age range:</strong> 1 day to 50 years<br>
-                <strong>Weight range:</strong> 3.5kg to 150kg<br>
+                <strong>Age range:</strong> 1 day to 50 years<br />
+                <strong>Weight range:</strong> 3.5kg to 150kg<br />
                 <strong>Height range:</strong> 50cm to 190cm
               </p>
             </div>
           </div>
-          
-          <p style="margin-top: 1rem;">
+
+          <p style="margin-top: 1rem">
             <small>
-              The interpolated grid model provides fast, accurate predictions while maintaining 
-              excellent fidelity to the original Groningen GAM. For research applications requiring 
-              maximum precision, consider using the original R GAM model directly.
+              The interpolated grid model provides fast, accurate predictions
+              while maintaining excellent fidelity to the original Groningen
+              GAM. For research applications requiring maximum precision,
+              consider using the original R GAM model directly.
             </small>
           </p>
         </article>
@@ -303,7 +374,10 @@
     <footer class="container">
       <small>
         <p>
-          <em>For clinical decision support only. Always verify with institutional protocols.</em>
+          <em
+            >For clinical decision support only. Always verify with
+            institutional protocols.</em
+          >
         </p>
       </small>
     </footer>
@@ -317,17 +391,17 @@
       const testCases = [
         {
           name: "Newborn Male",
-          age: 0.003,      // ≈1 day old - FIXED from age 0
+          age: 0.003, // ≈1 day old - FIXED from age 0
           sex: "male",
           weight: 3.5,
           height: 50,
-          expectedAAD: 6.2213,   // Updated interpolated value
-          expectedSD: 0.9324,    // Updated interpolated value
-          canonicalAAD: 6.1990,  // Original GAM (for reference)
-          canonicalSD: 0.9340    // Original GAM (for reference)
+          expectedAAD: 6.2213, // Updated interpolated value
+          expectedSD: 0.9324, // Updated interpolated value
+          canonicalAAD: 6.199, // Original GAM (for reference)
+          canonicalSD: 0.934, // Original GAM (for reference)
         },
         {
-          name: "Infant Female", 
+          name: "Infant Female",
           age: 1,
           sex: "female",
           weight: 10.0,
@@ -335,18 +409,18 @@
           expectedAAD: 10.0688,
           expectedSD: 1.0299,
           canonicalAAD: 10.0416,
-          canonicalSD: 1.0299
+          canonicalSD: 1.0299,
         },
         {
           name: "Toddler Male",
           age: 3,
-          sex: "male", 
+          sex: "male",
           weight: 15.0,
           height: 95,
           expectedAAD: 12.3796,
           expectedSD: 1.2051,
           canonicalAAD: 12.3457,
-          canonicalSD: 1.2023
+          canonicalSD: 1.2023,
         },
         {
           name: "School-age Female",
@@ -357,7 +431,7 @@
           expectedAAD: 14.2851,
           expectedSD: 1.3582,
           canonicalAAD: 14.2405,
-          canonicalSD: 1.3575
+          canonicalSD: 1.3575,
         },
         {
           name: "Adolescent Male",
@@ -368,7 +442,7 @@
           expectedAAD: 18.9819,
           expectedSD: 1.7277,
           canonicalAAD: 18.9601,
-          canonicalSD: 1.7242
+          canonicalSD: 1.7242,
         },
         {
           name: "Young Adult Female",
@@ -379,7 +453,7 @@
           expectedAAD: 19.5638,
           expectedSD: 1.6732,
           canonicalAAD: 19.6336,
-          canonicalSD: 1.6731
+          canonicalSD: 1.6731,
         },
         {
           name: "Middle-aged Male",
@@ -390,7 +464,7 @@
           expectedAAD: 23.4203,
           expectedSD: 1.7446,
           canonicalAAD: 23.4241,
-          canonicalSD: 1.7285
+          canonicalSD: 1.7285,
         },
         {
           name: "Large Adult Male",
@@ -401,7 +475,7 @@
           expectedAAD: 24.4319,
           expectedSD: 1.8236,
           canonicalAAD: 24.3884,
-          canonicalSD: 1.8113
+          canonicalSD: 1.8113,
         },
         {
           name: "Small Adult Female",
@@ -409,10 +483,10 @@
           sex: "female",
           weight: 45.0,
           height: 150,
-          expectedAAD: 20.4350,
+          expectedAAD: 20.435,
           expectedSD: 1.6576,
           canonicalAAD: 20.3198,
-          canonicalSD: 1.6570
+          canonicalSD: 1.657,
         },
         {
           name: "Very Large Male",
@@ -421,10 +495,10 @@
           weight: 150.0,
           height: 190,
           expectedAAD: 26.0737,
-          expectedSD: 1.8730,
+          expectedSD: 1.873,
           canonicalAAD: 25.9667,
-          canonicalSD: 1.8569
-        }
+          canonicalSD: 1.8569,
+        },
       ];
 
       let calculator = null;
@@ -440,23 +514,23 @@
 
       // Run all test cases
       async function runAllTests() {
-        const runButton = document.getElementById('runTestsBtn');
-        const testStatus = document.getElementById('testStatus');
-        const testProgress = document.getElementById('testProgress');
-        const testStatusText = document.getElementById('testStatusText');
-        const testResults = document.getElementById('testResults');
-        const testSummary = document.getElementById('testSummary');
+        const runButton = document.getElementById("runTestsBtn");
+        const testStatus = document.getElementById("testStatus");
+        const testProgress = document.getElementById("testProgress");
+        const testStatusText = document.getElementById("testStatusText");
+        const testResults = document.getElementById("testResults");
+        const testSummary = document.getElementById("testSummary");
 
         // Show progress
         runButton.disabled = true;
-        testStatus.style.display = 'block';
+        testStatus.style.display = "block";
         testProgress.value = 0;
-        testResults.innerHTML = '';
-        testSummary.style.display = 'none';
+        testResults.innerHTML = "";
+        testSummary.style.display = "none";
 
         try {
           // Initialize calculator
-          testStatusText.textContent = 'Loading model...';
+          testStatusText.textContent = "Loading model...";
           await initCalculator();
 
           let passed = 0;
@@ -467,7 +541,9 @@
           // Run each test case
           for (let i = 0; i < testCases.length; i++) {
             const testCase = testCases[i];
-            testStatusText.textContent = `Testing ${testCase.name} (${i + 1}/${testCases.length})...`;
+            testStatusText.textContent = `Testing ${testCase.name} (${i + 1}/${
+              testCases.length
+            })...`;
             testProgress.value = (i / testCases.length) * 100;
 
             try {
@@ -492,50 +568,50 @@
                 result,
                 aadError,
                 sdError,
-                testPass
+                testPass,
               });
-
             } catch (error) {
               failed++;
               results.push({
                 testCase,
                 error: error.message,
-                testPass: false
+                testPass: false,
               });
             }
 
             // Small delay to show progress
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
           }
 
           // Show results
           testProgress.value = 100;
-          testStatusText.textContent = 'Tests completed!';
-          
+          testStatusText.textContent = "Tests completed!";
+
           displayTestResults(results, passed, failed, tolerance);
-          
         } catch (error) {
-          testStatusText.textContent = 'Test failed: ' + error.message;
+          testStatusText.textContent = "Test failed: " + error.message;
           testResults.innerHTML = `<p style="color: var(--pico-del-color);">Failed to run tests: ${error.message}</p>`;
         } finally {
           runButton.disabled = false;
           setTimeout(() => {
-            testStatus.style.display = 'none';
+            testStatus.style.display = "none";
           }, 2000);
         }
       }
 
       // Display test results
       function displayTestResults(results, passed, failed, tolerance) {
-        const testResults = document.getElementById('testResults');
-        const testSummary = document.getElementById('testSummary');
+        const testResults = document.getElementById("testResults");
+        const testSummary = document.getElementById("testSummary");
 
         // Summary
-        const passRate = (passed / (passed + failed) * 100).toFixed(1);
-        
+        const passRate = ((passed / (passed + failed)) * 100).toFixed(1);
+
         testSummary.innerHTML = `
-          <div style="background: var(--pico-${failed === 0 ? 'ins' : 'del'}-background-color); 
-                      color: var(--pico-${failed === 0 ? 'ins' : 'del'}-color); 
+          <div style="background: var(--pico-${
+            failed === 0 ? "ins" : "del"
+          }-background-color); 
+                      color: var(--pico-${failed === 0 ? "ins" : "del"}-color); 
                       padding: 1rem; 
                       border-radius: var(--pico-border-radius); 
                       text-align: center;">
@@ -544,21 +620,28 @@
             <small>Tolerance: ±${tolerance} mm | Validated against interpolated R model</small>
           </div>
         `;
-        testSummary.style.display = 'block';
+        testSummary.style.display = "block";
 
         // Detailed results
-        let html = '<div style="overflow-x: auto;"><table class="striped"><thead><tr>';
-        html += '<th>Test Case</th><th>Expected AAD</th><th>Actual AAD</th><th>AAD Error</th>';
-        html += '<th>Expected SD</th><th>Actual SD</th><th>SD Error</th><th>Result</th>';
-        html += '</tr></thead><tbody>';
+        let html =
+          '<div style="overflow-x: auto;"><table class="striped"><thead><tr>';
+        html +=
+          "<th>Test Case</th><th>Expected AAD</th><th>Actual AAD</th><th>AAD Error</th>";
+        html +=
+          "<th>Expected SD</th><th>Actual SD</th><th>SD Error</th><th>Result</th>";
+        html += "</tr></thead><tbody>";
 
-        results.forEach(result => {
-          const statusIcon = result.testPass ? '✅' : '❌';
-          
+        results.forEach((result) => {
+          const statusIcon = result.testPass ? "✅" : "❌";
+
           if (result.error) {
             html += `<tr><td>${result.testCase.name}</td><td colspan="6">Error: ${result.error}</td><td>${statusIcon}</td></tr>`;
           } else {
-            html += `<tr style="background-color: ${result.testPass ? 'var(--pico-ins-background-color)' : 'var(--pico-del-background-color)'};">`;
+            html += `<tr style="background-color: ${
+              result.testPass
+                ? "var(--pico-ins-background-color)"
+                : "var(--pico-del-background-color)"
+            };">`;
             html += `<td><strong>${result.testCase.name}</strong></td>`;
             html += `<td>${result.testCase.expectedAAD.toFixed(3)}</td>`;
             html += `<td>${result.result.meanAAD.toFixed(3)}</td>`;
@@ -567,38 +650,39 @@
             html += `<td>${result.result.stdDev.toFixed(3)}</td>`;
             html += `<td>${result.sdError.toFixed(4)}</td>`;
             html += `<td>${statusIcon}</td>`;
-            html += '</tr>';
+            html += "</tr>";
           }
         });
 
-        html += '</tbody></table></div>';
+        html += "</tbody></table></div>";
         testResults.innerHTML = html;
       }
 
       // Clear results
       function clearResults() {
-        document.getElementById('testResults').innerHTML = `
+        document.getElementById("testResults").innerHTML = `
           <p style="text-align: center; color: var(--pico-muted-color); font-style: italic;">
             Click "Run All Test Cases" to validate the calculator
           </p>
         `;
-        document.getElementById('testSummary').style.display = 'none';
+        document.getElementById("testSummary").style.display = "none";
       }
 
       // Update status indicator when model loads
       async function updateStatus() {
         try {
           await initCalculator();
-          document.getElementById('statusIndicator').style.color = '#28a745';
-          document.getElementById('statusText').textContent = 'Model Ready';
+          document.getElementById("statusIndicator").style.color = "#28a745";
+          document.getElementById("statusText").textContent = "Model Ready";
         } catch (error) {
-          document.getElementById('statusIndicator').style.color = '#dc3545';
-          document.getElementById('statusText').textContent = 'Model Load Failed';
+          document.getElementById("statusIndicator").style.color = "#dc3545";
+          document.getElementById("statusText").textContent =
+            "Model Load Failed";
         }
       }
 
       // Initialize on page load
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         updateStatus();
       });
     </script>

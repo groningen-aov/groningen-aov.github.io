@@ -6,6 +6,17 @@
 // 👇 ADD NEW VERSIONS AT THE TOP OF THIS ARRAY! 👇
 const versionHistory = [
   {
+    version: '1.1.0',
+    date: '2025-08-23',
+    notes: 'adds  batch processing support, improve error handling, SW updates',
+    features: [
+      'Batch processing support for data processing via paste or csv upload',
+      'Updated service worker for better caching and offline support',
+      'Minor UI enhancements for better user experience',
+    ]
+
+  },
+  {
     version: '1.0.2',
     date: '2025-08-18',
     notes: 'Updated icons/manifest/sw',
@@ -164,7 +175,7 @@ class SimpleVersionManager {
       const versionElement = document.createElement('p');
       versionElement.innerHTML = `
         <small>
-          Based on the Groningen GAM model | University of Groningen | 
+          Based on the <a href="/about/#citation">Groningen GAM model</a> | University of Groningen | 
           <a href="#" id="versionLink" title="Click to see version history">
             <span id="versionDisplay">Loading...</span>
           </a>

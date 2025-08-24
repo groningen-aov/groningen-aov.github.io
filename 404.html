@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Groningen AOV Z-Score Calculator</title>
+    <link rel="stylesheet" href="style/pico.blue.min.css">
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="icon" href="icons/favicon.ico">
+    <meta name="theme-color" content="#1976d2">
+</head>
+<body>
+    <main class="container">
+        <!-- Navigation matching your main site -->
+        <nav>
+            <ul>
+                <li><strong>Groningen AOV Calculator</strong></li>
+            </ul>
+            <ul>
+                <li><a href="/" class="contrast">Home</a></li>
+                <li><a href="/about/" class="contrast">About</a></li>
+                <li><a href="/test/" class="contrast">Test</a></li>
+            </ul>
+        </nav>
+
+        <!-- 404 Content -->
+        <article style="text-align: center; padding: 2rem 0;">
+            <header>
+                <h1 style="font-size: 4rem; color: var(--pico-muted-color); margin-bottom: 1rem;">404</h1>
+                <h2>Page Not Found</h2>
+                <p style="margin-bottom: 2rem;">The page you're looking for doesn't exist or may have been moved.</p>
+            </header>
+
+            <!-- Quick Navigation -->
+            <section style="margin: 2rem 0;">
+                <h3>Where would you like to go?</h3>
+                <div class="grid" style="max-width: 600px; margin: 0 auto;">
+                    <a href="/" role="button" class="outline">
+                        🏠 Calculator Home
+                    </a>
+                    <a href="/about/" role="button" class="outline">
+                        📖 About the Model
+                    </a>
+                    <a href="/test/" role="button" class="outline">
+                        🧪 Validation Tests
+                    </a>
+                </div>
+            </section>
+
+            <!-- Helpful Information -->
+            <details style="max-width: 600px; margin: 2rem auto; text-align: left;">
+                <summary>Common Issues</summary>
+                <ul>
+                    <li><strong>Old bookmark?</strong> Try the <a href="/">calculator home page</a></li>
+                    <li><strong>Looking for results?</strong> Results are generated from the main calculator</li>
+                    <li><strong>Direct link not working?</strong> The calculator uses form submission for results</li>
+                    <li><strong>PWA installation issues?</strong> Visit the home page to install the app</li>
+                </ul>
+            </details>
+
+            <!-- Search/Manual URL Entry -->
+            <section style="max-width: 400px; margin: 2rem auto;">
+                <label for="manual-url">Or navigate manually:</label>
+                <input type="text" id="manual-url" placeholder="Enter a page path..." 
+                       onkeypress="if(event.key==='Enter') navigateToPath()">
+                <button onclick="navigateToPath()">Go</button>
+            </section>
+        </article>
+
+        <!-- Footer matching your main site -->
+        <footer style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--pico-muted-border-color);">
+            <small>
+                <a href="/">Groningen AOV Z-Score Calculator</a> • 
+                <a href="/about/">Clinical Tool</a> • 
+                <span id="connection-status">⚪ Offline Ready</span>
+            </small>
+        </footer>
+    </main>
+
+    <script>
+        // Manual navigation function
+        function navigateToPath() {
+            const input = document.getElementById('manual-url');
+            const path = input.value.trim();
+            if (path) {
+                // Ensure path starts with /
+                const cleanPath = path.startsWith('/') ? path : '/' + path;
+                window.location.href = cleanPath;
+            }
+        }
+
+        // PWA theme detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Service worker registration (if available)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {
+                // Silent fail for 404 page
+            });
+        }
+
+        // Connection status (simple version for 404 page)
+        function updateConnectionStatus() {
+            const status = document.getElementById('connection-status');
+            if (status) {
+                status.textContent = navigator.onLine ? '🟢 Online' : '🔴 Offline';
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        updateConnectionStatus();
+    </script>
+</body>
+</html>

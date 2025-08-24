@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Offline - Groningen AOV Calculator</title>
+  <link rel="icon" href="/favicon.ico">
+  
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    
+    .offline-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 3rem;
+      text-align: center;
+      max-width: 500px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .offline-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      opacity: 0.9;
+    }
+    
+    .retry-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      margin: 1rem 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .retry-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .status-info {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .debug-info {
+      margin-top: 1rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+    
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .offline-container { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.5rem; }
+      .offline-icon { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">📡</div>
+    <h1>You're Offline</h1>
+    <p>The Groningen AOV Calculator is temporarily unavailable. This could be due to a network issue or a problem with the app's cache.</p>
+    
+    <button class="retry-button" onclick="retryConnection()">
+      🔄 Try Again
+    </button>
+    
+    <button class="retry-button" onclick="clearCacheAndRetry()">
+      🧹 Clear Cache & Retry
+    </button>
+    
+    <div class="status-info">
+      <strong>Status:</strong> <span id="status">Checking connection...</span><br>
+      <strong>Last Check:</strong> <span id="lastCheck">-</span>
+    </div>
+    
+    <div class="debug-info" id="debugInfo"></div>
+  </div>
+
+  <script>
+    let retryCount = 0;
+    
+    // Check connection status
+    async function checkConnection() {
+      const status = document.getElementById('status');
+      const lastCheck = document.getElementById('lastCheck');
+      
+      try {
+        const start = performance.now();
+        const response = await fetch('/manifest.json', { 
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+        const end = performance.now();
+        const latency = Math.round(end - start);
+        
+        if (response.ok) {
+          status.innerHTML = `🟢 Connected (${latency}ms)`;
+          status.style.color = '#4ade80';
+        } else {
+          status.innerHTML = `🟡 Server Error (${response.status})`;
+          status.style.color = '#fbbf24';
+        }
+      } catch (error) {
+        status.innerHTML = `🔴 No Connection`;
+        status.style.color = '#f87171';
+      }
+      
+      lastCheck.textContent = new Date().toLocaleTimeString();
+    }
+    
+    // Retry connection
+    async function retryConnection() {
+      retryCount++;
+      
+      const button = event.target;
+      const originalText = button.innerHTML;
+      button.innerHTML = '🔄 Checking...';
+      button.disabled = true;
+      
+      await checkConnection();
+      
+      // If online, try to reload
+      if (navigator.onLine) {
+        button.innerHTML = '🔄 Reloading...';
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      }
+    }
+    
+    // Clear cache and retry
+    async function clearCacheAndRetry() {
+      const button = event.target;
+      const originalText = button.innerHTML;
+      button.innerHTML = '🧹 Clearing...';
+      button.disabled = true;
+      
+      try {
+        // Clear caches
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+        
+        // Clear storage
+        if ('localStorage' in window) {
+          localStorage.clear();
+          sessionStorage.clear();
+        }
+        
+        button.innerHTML = '🔄 Reloading...';
+        
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+        
+      } catch (error) {
+        console.error('Cache clear failed:', error);
+        button.innerHTML = originalText;
+        button.disabled = false;
+      }
+    }
+    
+    // Show debug info
+    function showDebugInfo() {
+      const debugInfo = document.getElementById('debugInfo');
+      const info = [
+        `User Agent: ${navigator.userAgent}`,
+        `Online: ${navigator.onLine}`,
+        `SW Support: ${'serviceWorker' in navigator}`,
+        `Cache Support: ${'caches' in window}`,
+        `Retry Count: ${retryCount}`,
+        `URL: ${window.location.href}`,
+        `Referrer: ${document.referrer || 'Direct'}`,
+        `Timestamp: ${Date.now()}`
+      ];
+      
+      debugInfo.innerHTML = info.join('<br>');
+    }
+    
+    // Auto-check connection every 10 seconds
+    setInterval(checkConnection, 10000);
+    
+    // Initial status check
+    checkConnection();
+    showDebugInfo();
+    
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      checkConnection();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    });
+    
+    window.addEventListener('offline', () => {
+      checkConnection();
+    });
+    
+    // Show retry count in console for debugging
+    console.log('Groningen AOV Calculator - Offline Page');
+    console.log('If you see this repeatedly, there may be a service worker issue.');
+    console.log('Try: pwaDebug.reset() in the console');
+  </script>
+</body>
+</html>
