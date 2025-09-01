@@ -6,6 +6,15 @@
 // 👇 ADD NEW VERSIONS AT THE TOP OF THIS ARRAY! 👇
 const versionHistory = [
   {
+    version: "1.1.2",
+    date: "2025-09-01",
+    notes: "UX updates, results summary",
+    features: [
+      "Added input summary to results page for clarity",
+      "Improved UX with cleaner layout and navigation",
+    ],
+  },
+  {
     version: "1.1.1", 
     date: "2025-08-24",
     notes: "improved PWA status, manifest minimal-IUI display",

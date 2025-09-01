@@ -83,14 +83,6 @@
               <label for="age">Age</label>
               <div class="grid">
                 <div>
-                  <select id="age-unit" name="ageUnit" class="age-unit-select">
-                    <option value="years" selected>years</option>
-                    <option value="months">months</option>
-                    <option value="weeks">weeks</option>
-                    <option value="days">days</option>
-                  </select>
-                </div>
-                <div>
                   <input
                     type="number"
                     id="age-value"
@@ -100,6 +92,14 @@
                     placeholder="Enter age"
                     required
                   />
+                </div>
+                <div>
+                  <select id="age-unit" name="ageUnit" class="age-unit-select">
+                    <option value="years" selected>years</option>
+                    <option value="months">months</option>
+                    <option value="weeks">weeks</option>
+                    <option value="days">days</option>
+                  </select>
                 </div>
               </div>
               <span class="conversion" id="age-conversion"></span>
@@ -174,13 +174,13 @@
             <!-- Measured Aortic Annulus Input -->
             <div class="form-section">
               <label for="measuredAAD">
-                Measured Aortic Annulus Diameter (mm) (optional)
+                Aortic Annulus Diameter (mm)
                 <input
                   type="number"
                   id="measuredAAD"
                   name="measuredAAD"
                   step="0.1"
-                  placeholder="Optional: Enter measured AAD in mm"
+                  placeholder="*Optional*: Enter measured AAD in mm"
                 />
               </label>
             </div>

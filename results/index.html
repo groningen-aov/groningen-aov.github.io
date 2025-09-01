@@ -49,8 +49,10 @@
       <!-- Header -->
       <header class="calculator-header">
         <hgroup>
-          <h1>Z-Score Results</h1>
-          <p>Aortic annulus diameter analysis using the Groningen GAM model</p>
+          <h1>Results</h1>
+          <p id="resultsDescription">
+            Aortic annulus diameter analysis using the Groningen GAM model
+          </p>
         </hgroup>
       </header>
 
@@ -97,7 +99,6 @@
               <small>±2 SD (mm)</small>
             </div>
           </div>
-
 
           <!-- Documentation Actions -->
           <div
@@ -148,14 +149,6 @@
               <label for="age">Age</label>
               <div class="grid">
                 <div>
-                  <select id="age-unit" name="ageUnit" class="age-unit-select">
-                    <option value="years" selected>years</option>
-                    <option value="months">months</option>
-                    <option value="weeks">weeks</option>
-                    <option value="days">days</option>
-                  </select>
-                </div>
-                <div>
                   <input
                     type="number"
                     id="age-value"
@@ -165,6 +158,14 @@
                     placeholder="Enter age"
                     required
                   />
+                </div>
+                <div>
+                  <select id="age-unit" name="ageUnit" class="age-unit-select">
+                    <option value="years" selected>years</option>
+                    <option value="months">months</option>
+                    <option value="weeks">weeks</option>
+                    <option value="days">days</option>
+                  </select>
                 </div>
               </div>
               <span class="conversion" id="age-conversion"></span>
@@ -239,13 +240,13 @@
             <!-- Measured Aortic Annulus Input -->
             <div class="form-section">
               <label for="measuredAAD">
-                Measured Aortic Annulus Diameter (mm) (optional)
+                Aortic Annulus Diameter (mm)
                 <input
                   type="number"
                   id="measuredAAD"
                   name="measuredAAD"
                   step="0.1"
-                  placeholder="Optional: Enter measured AAD in mm"
+                  placeholder="*Optional*: Enter measured AAD in mm"
                 />
               </label>
             </div>
@@ -470,12 +471,62 @@
           };
         }
 
+        updateInputSummary() {
+          // Get display values from URL (what user actually entered)
+          const sex = this.urlParams.get("sex") || "";
+          const age = this.urlParams.get("age") || "";
+          const ageUnit = this.urlParams.get("ageUnit") || "years";
+          const height = this.urlParams.get("height") || "";
+          const weight = this.urlParams.get("weight") || "";
+          const units = this.urlParams.get("units") || "metric";
+          const measuredAAD = this.urlParams.get("measuredAAD") || "";
+
+          if (!sex || !age || !height || !weight) {
+            // Keep default text if parameters are missing
+            return;
+          }
+
+          // Format age with abbreviated units as Gerton suggested
+          let ageDisplay;
+          switch (ageUnit) {
+            case "months":
+              ageDisplay = `${age}m`;
+              break;
+            case "weeks":
+              ageDisplay = `${age}w`;
+              break;
+            case "days":
+              ageDisplay = `${age}d`;
+              break;
+            default: // years
+              ageDisplay = `${age}y`;
+              break;
+          }
+
+          // Format height and weight with appropriate units
+          const heightDisplay =
+            units === "metric" ? `${height} cm` : `${height} in`;
+          const weightDisplay =
+            units === "metric" ? `${weight} kg` : `${weight} lb`;
+
+          const AADDisplay = measuredAAD ? `, ${measuredAAD} mm` : "";
+
+          // Create the summary string following Gerton's format
+          const summary = `Results for ${sex}, ${ageDisplay}, ${heightDisplay}, ${weightDisplay}${AADDisplay}`
+
+          // Update the description paragraph
+          document.getElementById("resultsDescription").textContent = summary;
+        }
+
         displayResults(result) {
           // Hide loading state and show results
           document.getElementById("loadingState").style.display = "none";
           document.getElementById("resultGrid").style.display = "grid";
           document.getElementById("documentationActions").style.display =
             "block";
+
+          //update input summary
+          this.updateInputSummary();
 
           // Update result cards
           if (result.zScore !== null) {
@@ -494,8 +545,6 @@
           ).textContent = `${result.lowerBound.toFixed(
             1
           )} - ${result.upperBound.toFixed(1)}`;
-
-          // No clinical interpretation - users are sophisticated enough to interpret Z-scores themselves
         }
 
         setupDocumentationActions() {

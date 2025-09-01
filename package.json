@@ -1,14 +1,10 @@
 {
   "name": "groningen-aov-zscore",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Progressive Web App for calculating aortic annulus diameter z-scores using the Groningen GAM model",
   "scripts": {
     "start": "npx http-server . -p 3000 -c-1",
     "dev": "npx http-server . -p 3000 -c-1 --cors",
-    "build": "npm run build:prepare && npm run build:copy && npm run build:finalize",
-    "build:prepare": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist')){fs.mkdirSync('dist', {recursive: true}); console.log('✅ Created dist directory');} else {console.log('✅ dist directory exists');}\"",
-    "build:copy": "node -e \"const fs=require('fs'),path=require('path');function copy(s,d){const st=fs.statSync(s);if(st.isDirectory()){if(!fs.existsSync(d))fs.mkdirSync(d,{recursive:true});fs.readdirSync(s).forEach(f=>copy(path.join(s,f),path.join(d,f)))}else fs.copyFileSync(s,d)}function safe(s,d,n){try{if(fs.existsSync(s)){copy(s,d);console.log('✅',n)}else console.log('⚠️ ',n,'not found')}catch(e){console.log('❌',n,'failed:',e.message)}}if(fs.existsSync('src')){fs.readdirSync('src').forEach(f=>copy(path.join('src',f),path.join('dist',f)));console.log('✅ Copied source files')}safe('manifest.json','dist/manifest.json','manifest');safe('icons','dist/icons','icons');safe('data','dist/data','data');safe('favicon.ico','dist/favicon.ico','favicon')\"",
-    "build:finalize": "echo Build completed! App accessible at root URL.",
     "test": "npm run test:syntax && npm run test:data",
     "test:syntax": "node -c sw.js && echo '✅ Service worker syntax valid'",
     "test:data": "echo '✅ Data validation completed'",
@@ -18,8 +14,7 @@
     "validate:sw": "node -c sw.js && echo '✅ Service worker syntax valid'",
     "setup": "npm install && echo '✅ Dependencies installed'",
     "icons:generate": "echo 'Install sharp: npm install --save-dev sharp, then create icons from source'",
-    "serve:https": "npx http-server dist -p 3000 -S -C cert.pem -K key.pem",
-    "deploy": "echo 'Deployment handled by AWS Amplify'"
+    "serve:https": "npx http-server dist -p 3000 -S -C cert.pem -K key.pem"
   },
   "repository": {
     "type": "git",
